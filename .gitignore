@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Environment files (NEVER commit secrets)
+.env
+.env.local
+.env.production
+
+# AI Model files (too large for git)
+backend/ai/saved_models/*.pt
+backend/ai/baseline_events.json
+agent/baseline_events.json
+
+# ZK compiled files (regenerate with scripts/generate_zk.sh)
+zk/circuit_js/
+zk/*.r1cs
+zk/*.sym
+zk/*.zkey
+zk/*.ptau
+zk/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
