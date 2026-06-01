@@ -1,125 +1,180 @@
-# AEGIS — Zero-Trust AI Security Platform
+# 🛡️ AEGIS — Zero-Trust AI Security Platform
 
+<div align="center">
+  
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.3-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-> **Real-time OS monitoring • AI anomaly detection • ZK-SNARK authentication • Tamper-proof audit chain**
+**Real-time OS monitoring • AI anomaly detection • ZK-SNARK authentication • Tamper-proof audit chain**
 
-AEGIS watches your operating system at the kernel level using eBPF, learns your normal behavior with an LSTM Autoencoder, detects anomalies in real-time, authenticates users without passwords using Zero-Knowledge proofs, and records every security event in a tamper-proof SHA-256 hash chain.
-
----
-
-## 🏗️ 4 Domains Combined
-
-| Domain | Technology | What It Does |
-|--------|-----------|-------------|
-| **Operating System** | eBPF + BCC | Kernel-level monitoring of files, processes, and network |
-| **Artificial Intelligence** | PyTorch LSTM Autoencoder | Behavioral anomaly detection trained on YOUR system |
-| **Cryptography** | ZK-SNARKs + SHA-256 + AES-256 | Passwordless auth + tamper-proof logs + encrypted storage |
-| **Web Technology** | React + FastAPI + WebSocket | Real-time dashboard with live threat visualization |
+</div>
 
 ---
 
-## 🔄 How It Works
+## 📖 Overview
 
+AEGIS is a next-generation security platform engineered to provide comprehensive, zero-trust infrastructure protection. It watches your operating system at the kernel level using eBPF, learns normal user behavior via an advanced **LSTM Autoencoder** neural network, and detects sophisticated anomalies in real-time. 
+
+Furthermore, AEGIS enforces stringent cryptographic security: it authenticates users entirely passwordlessly using **Zero-Knowledge Proofs (ZK-SNARKs)** and records every security event in a tamper-proof, append-only **SHA-256 hash chain**.
+
+---
+
+## 🏗️ Architectural Domains
+
+AEGIS unifies four complex technology domains into a single resilient security product:
+
+| Domain | Technology Stack | Purpose & Implementation |
+|--------|-----------------|--------------------------|
+| **Operating System** | eBPF + BCC + Python | Kernel-level deep packet and syscall inspection. Captures file access, process execution, and network connections invisibly. |
+| **Artificial Intelligence** | PyTorch LSTM Autoencoder | Behavioral anomaly detection trained on local telemetry. Avoids signature-based blind spots by understanding "normal". |
+| **Cryptography** | ZK-SNARKs (circom) + SHA-256 | Privacy-preserving passwordless authentication. Cryptographically guarantees log integrity (WORM compliance). |
+| **Web Technology** | React 18 + FastAPI + WebSocket | High-performance, real-time command center interface with asynchronous event streaming. |
+
+---
+
+## 🔄 System Sequence Diagram
+
+The following sequence diagram details the full data flow—from kernel-level event capture up to the end-user dashboard presentation, including the Zero-Knowledge authentication phase.
+
+```mermaid
+sequenceDiagram
+    participant OS as Linux Kernel
+    participant Agent as eBPF Agent
+    participant Backend as FastAPI Server
+    participant AI as PyTorch Engine
+    participant Crypto as Audit Chain
+    participant DB as Supabase (PostgreSQL)
+    participant UI as React Dashboard
+    participant ZK as ZK-SNARK Prover
+
+    %% Authentication Phase
+    rect rgb(20, 25, 35)
+    note right of ZK: Passwordless ZK-SNARK Authentication
+    UI->>ZK: User enters ID + Secret
+    ZK->>UI: Generate ZK Proof (circom/snarkjs)
+    UI->>Backend: POST /api/auth/login (Proof)
+    Backend->>Backend: Verify ZK Proof & Signals
+    Backend->>DB: Fetch Authenticated User
+    DB-->>Backend: User Data
+    Backend-->>UI: JWT Token & Connection Authorized
+    end
+
+    %% Threat Detection Pipeline
+    rect rgb(35, 20, 30)
+    note right of OS: Real-Time Threat Detection & Audit Pipeline
+    OS->>Agent: Syscalls (File/Network/Process)
+    Agent->>Agent: Batch & Format to JSON
+    Agent->>Backend: POST /api/events (Telemetry Payload)
+    
+    par AI Scoring & Hash Chaining
+        Backend->>AI: Analyze Event Data
+        AI-->>Backend: Anomaly Score (0-100) & Classification
+    and
+        Backend->>Crypto: Compute SHA-256 Hash
+        Crypto-->>Backend: Cryptographic Signature
+    end
+
+    Backend->>DB: Store Event + Threat Score + Hash Signature
+    DB-->>Backend: Acknowledgment
+    
+    Backend->>UI: Broadcast via WebSocket (Live Stream)
+    UI->>UI: Update Threat Gauge & Alert Feed
+    end
 ```
-┌──────────────────┐     JSON events     ┌──────────────────┐     WebSocket     ┌──────────────────┐
-│                  │ ──────────────────▶ │                  │ ────────────────▶ │                  │
-│   eBPF Agent     │                     │   FastAPI + AI   │                   │  React Dashboard │
-│   (Linux kernel) │                     │   (scoring)      │                   │  (live UI)       │
-│                  │                     │                  │                   │                  │
-└──────────────────┘                     └────────┬─────────┘                   └──────────────────┘
-                                                  │
-                                          ┌───────▼───────┐
-                                          │  Supabase DB  │
-                                          │  + Audit Chain│
-                                          └───────────────┘
-```
-
-1. **Agent** hooks into Linux kernel via eBPF → captures every file open, process exec, network connection
-2. **AI Engine** scores each event (0-100) using LSTM Autoencoder trained on your normal behavior
-3. **Backend** broadcasts scored events via WebSocket to all connected dashboards
-4. **Dashboard** shows live threat feed, animated gauge, and alerts
-5. **Audit Chain** records all threats in an encrypted, hash-linked chain that's tamper-proof
-6. **ZK Auth** — login without ever sending your password
 
 ---
 
-## 🛠️ Tech Stack
+## 🔐 Core Features Deep Dive
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| OS Monitor | Python + BCC/eBPF | Kernel-level event capture |
-| AI Model | PyTorch LSTM Autoencoder | Behavioral anomaly scoring |
-| ZK Proofs | circom + snarkjs | Passwordless authentication |
-| Backend | FastAPI + WebSocket | API, scoring, streaming |
-| Frontend | React + Vite + TypeScript | Real-time dashboard |
-| Database | Supabase (PostgreSQL) | Persistent storage |
-| Encryption | AES-256 (Fernet) + SHA-256 | Log encryption + hash chain |
-| Deployment | Docker + Render + Netlify | Cloud hosting |
+### 1. ZK-SNARK Passwordless Authentication
+Eliminate credential stuffing and password theft. Users authenticate by proving they possess a secret without ever transmitting the secret itself. Powered by `circom` and `snarkjs` using Poseidon hashing.
+
+### 2. LSTM Autoencoder Threat Engine
+Traditional antiviruses use static signatures. AEGIS uses a local PyTorch model to learn the specific baseline behavior of your machine. It detects zero-day attacks by recognizing when system behavior statistically deviates from the norm.
+
+### 3. eBPF Kernel-Level Telemetry
+Operates entirely in kernel space (like Cloudflare and Meta infrastructure tools). AEGIS intercepts syscalls before they reach user space, making it virtually impossible for malware to hide file executions or unauthorized network sockets.
+
+### 4. Tamper-Proof Cryptographic Audit Trail
+Every detected event is linked to the previous event via a cryptographic SHA-256 hash. If an attacker attempts to delete or alter a past log in the database, the hash chain breaks, immediately flagging the database as compromised.
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Comprehensive Tech Stack
+
+- **System Level:** Python 3.10, BCC, eBPF
+- **Machine Learning:** PyTorch, NumPy, Scikit-learn
+- **Cryptography:** circom, snarkjs, AES-256 (Fernet), SHA-256
+- **Backend API:** FastAPI, Uvicorn, Pydantic, WebSockets
+- **Frontend UI:** React 18, TypeScript, Vite, TailwindCSS (optional integration)
+- **Database:** Supabase (PostgreSQL)
+- **Infrastructure:** Docker, Docker Compose, WSL2
+
+---
+
+## 🚀 Installation & Deployment
 
 ### Prerequisites
-- WSL2 Ubuntu (for Windows users)
+- Linux or **WSL2** (Ubuntu recommended for Windows users)
 - Python 3.10+
 - Node.js 18+
-- Git
+- Docker & Docker Compose (Optional but recommended)
 
-### Quick Setup
+### Quick Start (Local Development)
 
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/yourusername/aegis.git
 cd aegis
 
-# Option 1: Use the setup script (WSL2)
+# 2. Automated WSL2 Setup
 chmod +x scripts/setup_wsl.sh
 ./scripts/setup_wsl.sh
-
-# Option 2: Manual setup
-# Backend
-cd backend
-pip install -r requirements.txt
-cp .env.example .env  # Edit with your values
-
-# Frontend
-cd ../frontend
-npm install
-cp .env.example .env
 ```
 
-### Run Locally
+### Manual Service Startup
+
+To run the platform services manually, you need three terminal instances:
 
 ```bash
-# Terminal 1: Backend
+# Terminal 1: Core Backend & API
 cd backend
+pip install -r requirements.txt
+cp .env.example .env # Configure Supabase keys
 uvicorn main:app --reload --port 8000
 
-# Terminal 2: eBPF Agent (needs sudo, WSL2/Linux only)
+# Terminal 2: eBPF Monitoring Agent (Requires Root/Sudo)
 cd agent
+pip install -r requirements.txt
 sudo python3 agent.py
 
-# Terminal 3: Frontend
+# Terminal 3: React Dashboard
 cd frontend
+npm install
+cp .env.example .env
 npm run dev
 ```
 
-Open **http://localhost:5173** → Register → See live events!
+Navigate to **http://localhost:5173** to access the dashboard. 
 
-### Train the AI Model
+> **Note:** You can run the backend and frontend without the eBPF agent using the built-in demo event generator.
+
+---
+
+## 🧠 AI Model Training
+
+Train the LSTM Autoencoder to your machine's baseline:
 
 ```bash
-# Generate synthetic training data
-python3 scripts/train_model.py --generate 500
+# Generate synthetic baseline data (for testing)
+python3 scripts/train_model.py --generate 1000
 
-# Or use real collected data after running the agent
+# Train the model on real captured system data
 python3 scripts/train_model.py agent/baseline_events.json
 ```
 
@@ -127,82 +182,63 @@ python3 scripts/train_model.py agent/baseline_events.json
 
 ## 📡 API Reference
 
-| Method | Endpoint | Description |
-|--------|---------|-------------|
-| `GET` | `/` | Health check |
-| `GET` | `/health` | AI engine status |
-| `POST` | `/api/auth/register` | Register with ZK hash |
-| `POST` | `/api/auth/login` | Login with ZK proof |
-| `POST` | `/api/events` | Receive OS events (agent) |
-| `GET` | `/api/events/recent` | Last 100 events |
-| `GET` | `/api/events/stats` | Event statistics |
-| `GET` | `/api/audit` | Audit log entries |
-| `GET` | `/api/audit/verify/chain` | Verify chain integrity |
-| `GET` | `/api/audit/export/json` | Export audit report |
-| `WS` | `/ws/events` | Live event stream |
+| Method | REST Endpoint | Functionality |
+|--------|--------------|---------------|
+| `POST` | `/api/auth/register` | Register identity using ZK public hash |
+| `POST` | `/api/auth/login` | Authenticate using ZK zero-knowledge proof |
+| `POST` | `/api/events` | Ingest telemetry from eBPF agent |
+| `GET` | `/api/events/recent` | Retrieve latest 100 system events |
+| `GET` | `/api/events/stats` | Aggregate statistics for analytics |
+| `GET` | `/api/audit` | Fetch cryptographic audit logs |
+| `GET` | `/api/audit/verify/chain` | Run validation on the SHA-256 log chain |
+| `WS` | `/ws/events` | Real-time bidirectional event streaming |
 
 ---
 
-## 🔐 Key Features
+## 📁 Repository Architecture
 
-- **No passwords. Ever.** ZK-SNARK proof authentication
-- **OS-level monitoring** using eBPF (same tech as Cloudflare, Meta)
-- **AI model trained on YOUR behavior**, not generic rules
-- **Tamper-proof audit logs** with SHA-256 hash chain
-- **Real-time dashboard** with WebSocket streaming
-- **AES-256 encryption** for all stored data
-- **Demo mode** — works without a running agent
-
----
-
-## 📁 Project Structure
-
-```
+```text
 aegis/
-├── agent/                    # eBPF OS monitor (Linux)
-│   ├── agent.py              # Main eBPF hook script
-│   ├── collector.py          # Event buffering
-│   └── sender.py             # HTTP batch sender
-├── backend/                  # FastAPI server
-│   ├── main.py               # App entry point
-│   ├── api/                  # REST + WebSocket routes
-│   ├── ai/                   # LSTM Autoencoder engine
-│   ├── crypto/               # ZK verify + audit chain + AES
-│   ├── db/                   # Supabase client
-│   └── core/                 # Config + Pydantic models
-├── frontend/                 # React dashboard
-│   └── src/
-│       ├── pages/            # Login, Dashboard, Audit, Settings
-│       ├── components/       # ThreatFeed, ThreatGauge, AlertBanner
-│       ├── hooks/            # useWebSocket, useZKAuth
-│       └── services/         # API client
-├── zk/                       # ZK circuit files
-│   └── circuit.circom        # Poseidon hash proof circuit
-├── scripts/                  # Setup & training scripts
-├── docker-compose.yml        # Full stack deployment
-└── README.md
+├── agent/                    # eBPF Kernel-space monitor (Linux)
+│   ├── agent.py              # Main BCC hook script
+│   ├── collector.py          # Ring-buffer & telemetry aggregation
+│   └── sender.py             # HTTP dispatcher
+├── backend/                  # FastAPI Core Server
+│   ├── ai/                   # PyTorch LSTM Engine & training logic
+│   ├── api/                  # REST & WebSocket controllers
+│   ├── crypto/               # ZK verifiers & hash chain logic
+│   ├── db/                   # Supabase ORM/Clients
+│   └── main.py               # Uvicorn entry point
+├── frontend/                 # React 18 Dashboard
+│   ├── src/components/       # Real-time ThreatFeed & Visualizations
+│   ├── src/hooks/            # useWebSocket & useZKAuth custom hooks
+│   └── src/pages/            # Dashboard, Audit, Login interfaces
+├── zk/                       # Zero-Knowledge Circuit Definitions
+│   └── circuit.circom        # Poseidon hash proving circuits
+└── scripts/                  # CI/CD and Bootstrapping utilities
 ```
 
 ---
 
-## 🐳 Docker Deployment
+## 🐳 Containerization
+
+AEGIS is fully dockerized for cloud deployments (Render, AWS, DigitalOcean).
 
 ```bash
-# Build and run everything
-docker-compose up --build
-
-# Or deploy separately:
-# Backend → Render (render.com)
-# Frontend → Netlify (netlify.com)
+# Build and orchestrate all services via Docker Compose
+docker-compose up --build -d
 ```
 
 ---
 
-## 📄 License
+## 📄 License & Attribution
 
-MIT License — Built for learning, research, and portfolio.
+Released under the **MIT License**.  
+Engineered for advanced cybersecurity research, zero-trust infrastructure paradigms, and portfolio demonstration.
 
 ---
 
-**Built with:** Python · PyTorch · circom · snarkjs · FastAPI · React · Supabase · eBPF  
-**Cost:** ₹0 | **Domains:** 4 | **Architecture:** Zero-Trust
+<div align="center">
+  <b>Architected with Zero-Trust Principles</b><br>
+  Python · PyTorch · circom · snarkjs · FastAPI · React · Supabase · eBPF
+</div>
