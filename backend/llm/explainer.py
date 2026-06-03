@@ -224,7 +224,7 @@ class AlertExplainer:
         r = http_requests.post(
             "http://localhost:11434/api/generate",
             json={"model": self.ollama_model, "prompt": prompt, "stream": False},
-            timeout=30,
+            timeout=10,
         )
 
         if r.status_code == 200:

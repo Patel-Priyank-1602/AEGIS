@@ -112,7 +112,7 @@ async def receive_events(batch: EventBatch):
 
         # ── Step 8: LLM Explanation (high-severity only) ────────
         if event_dict["threat_score"] >= 50 and event_dict.get("mitre_technique_count", 0) > 0:
-            explanation = alert_explainer.explain(event_dict)
+            explanation = await asyncio.to_thread(alert_explainer.explain, event_dict)
             event_dict["explanation"] = explanation.get("explanation", "")
             event_dict["explanation_method"] = explanation.get("method", "")
 

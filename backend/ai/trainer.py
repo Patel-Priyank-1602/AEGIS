@@ -55,6 +55,9 @@ def train(events_list: list, epochs: int = EPOCHS, save: bool = True) -> dict:
     Returns:
         Dictionary with training metrics
     """
+    if len(events_list) > 250:
+        epochs = 1000
+
     print(f"╔══════════════════════════════════════════════╗")
     print(f"║         AEGIS AI Model Training              ║")
     print(f"╚══════════════════════════════════════════════╝")
@@ -163,7 +166,7 @@ if __name__ == "__main__":
         print("Usage: python3 trainer.py <path_to_events.json>")
         sys.exit(1)
 
-    with open(data_file) as f:
+    with open(data_file, encoding="utf-8") as f:
         events = json.load(f)
 
     train(events)
