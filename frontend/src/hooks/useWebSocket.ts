@@ -113,7 +113,10 @@ export function useWebSocket(url: string): UseWebSocketReturn {
     }
     connect()
     return () => {
-      ws.current?.close()
+      if (ws.current) {
+        ws.current.onclose = null // Prevent reconnect loop
+        ws.current.close()
+      }
       if (reconnectTimer.current) clearTimeout(reconnectTimer.current)
     }
   }, [connect])

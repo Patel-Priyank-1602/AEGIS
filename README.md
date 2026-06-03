@@ -101,54 +101,92 @@ To future-proof the audit logs against quantum computers running Shor's algorith
 
 ---
 
-## 🔄 Data Flow & Diagrams
+## 🔄 Comprehensive Data Flow & Sequence Diagram
 
-### 1. Unified Threat Detection & Audit Pipeline
-The following sequence details how an OS event is captured, scored by AI, sealed in the hash chain, and broadcasted to the dashboard.
+### 1. The 10-Layer Unified Threat Detection & Active Defense Pipeline
+This sequence details how a raw kernel event triggers the comprehensive multi-layered security pipeline, processes through all 10 intelligence modules, and is finally broadcasted to the command center.
 
 ```mermaid
 sequenceDiagram
-    participant OS as Linux Kernel
-    participant Agent as eBPF Agent
-    participant Backend as FastAPI Server
-    participant AI as PyTorch Engine
-    participant Crypto as SHA-256 Audit Chain
-    participant DB as Supabase
-    participant UI as React Dashboard
+    autonumber
+    participant Kernel as eBPF Kernel Hook
+    participant API as FastAPI Backend
+    participant Intel as Threat Intel (Bloom)
+    participant MITRE as MITRE Engine
+    participant AI_LSTM as Core AI (LSTM)
+    participant AI_UEBA as UEBA (Scikit)
+    participant AI_GNN as GNN Engine
+    participant Deception as Honeypot Layer
+    participant Action as Playbook Ledger
+    participant Forensics as Mem Forensics
+    participant Crypto as PQC & Hash Chain
+    participant Dash as React Dashboard
 
-    OS->>Agent: Syscalls (File/Net/Proc)
-    Agent->>Agent: Buffer & JSON Format
-    Agent->>Backend: POST /api/events (Telemetry Payload)
+    %% Ingestion
+    Kernel->>API: Raw OS Event (Proc, Net, File)
     
-    par AI Scoring & Hash Chaining
-        Backend->>AI: Feed to LSTM Autoencoder
-        AI-->>Backend: Anomaly Score (0-100) & Classification
+    %% Trivial O(1) Checks
+    API->>Intel: Check C2 Blacklists (O(1) Bloom)
+    Intel-->>API: Threat Intel Match?
+    
+    API->>MITRE: Heuristic Mapping
+    MITRE-->>API: MITRE TTPs (e.g., T1059)
+    
+    %% Multi-Model AI Ensembling
+    par AI Profiling Pipeline
+        API->>AI_LSTM: Autoencoder Reconstruction
+        AI_LSTM-->>API: Core Sequence Anomaly Score
     and
-        Backend->>Crypto: Compute Hash = SHA256(Event + PrevHash)
-        Crypto-->>Backend: Cryptographic Signature
+        API->>AI_UEBA: Isolation Forest User Profile
+        AI_UEBA-->>API: User Behavior Deviation
+    and
+        API->>AI_GNN: NetworkX Lateral Hop Analysis
+        AI_GNN-->>API: Network Topology Score
     end
-
-    Backend->>DB: Store [Event + Score + Hash Signature]
-    DB-->>Backend: 201 Created
     
-    Backend->>UI: Broadcast via WebSocket (Live Stream)
-    UI->>UI: Update Trend Charts & Threat Gauges
+    %% Decoy Overrides
+    API->>Deception: Verify Target Assets
+    opt Touches Canary/Honeypot?
+        Deception-->>API: Overwrite Score = 100 (Critical)
+    end
+    
+    %% Active Defense Response
+    opt If Final Score > Threshold
+        API->>Action: Trigger Automated Playbook
+        Action->>Kernel: Execute (e.g., Terminate Process)
+        Action->>Crypto: Log Reversible Action in Ledger
+        
+        API->>Forensics: Dump /proc/PID/mem
+        Forensics-->>API: YARA String Matches
+    end
+    
+    %% Immutable Logging & PQC
+    API->>Crypto: Sign data with Post-Quantum (Dilithium)
+    Crypto->>Crypto: Chained SHA-256 (Hash_N = hash(N-1 + Event))
+    Crypto-->>API: Cryptographic Seal
+    
+    %% UI Broadcast
+    API->>Dash: Broadcast Event via WebSocket
+    Dash->>API: Request Plain-Text Explanation
+    API->>Dash: LLM (Ollama) Explainer Stream
 ```
 
-### 2. Zero-Knowledge Passwordless Auth
+### 2. Zero-Knowledge Passwordless Auth Flow
 ```mermaid
 sequenceDiagram
     participant User as End User
-    participant Browser as Client (snarkjs)
-    participant Backend as Auth Service
-
-    User->>Browser: Enters ID & Secret locally
-    Browser->>Browser: Compute Poseidon Hash
-    Browser->>Browser: Generate ZK-SNARK Proof
+    participant Browser as React App (snarkjs)
+    participant Backend as FastAPI Auth
+    participant DB as Supabase
+    
+    User->>Browser: Enter Device ID & Secret Passphrase
+    Browser->>Browser: Compute Poseidon Hash Locally
+    Browser->>Browser: Generate ZK-SNARK Proof (Circom)
     Browser->>Backend: POST /login { proof, publicSignals }
-    Backend->>Backend: Verify Proof cryptographically
-    Backend-->>Browser: 200 OK + JWT Token
-    Note over Backend,Browser: The Secret never left the user's device!
+    Backend->>Backend: Verify SnarkJS Proof mathematically
+    Backend->>DB: Check Nullifier (Prevent Replay Attacks)
+    Backend-->>Browser: 200 OK + JWT (Zero Trust achieved)
+    Note over Browser,Backend: Cryptographic certainty without the secret ever leaving the device.
 ```
 
 ---
@@ -256,6 +294,7 @@ AEGIS/
 ├── backend/                  # Application Logic Layer (The Brain)
 │   ├── ai/                   # PyTorch LSTM Autoencoder (Baseline Anomaly Detection)
 │   ├── api/                  # FastAPI REST & WebSocket controllers (10-layer middleware)
+│   ├── core/                 # Configuration and environment settings
 │   ├── crypto/               # ZK-proof verification, SHA-256 chaining & Post-Quantum Cryptography
 │   ├── db/                   # Supabase PostgreSQL ORM & in-memory fallback
 │   ├── federated/            # Federated Learning Server (Differential Privacy aggregation)

@@ -81,7 +81,7 @@ def generate_attack_event() -> dict:
     }
 
 
-def send_batch(events: list, timeout: int = 15) -> bool:
+def send_batch(events: list, timeout: int = 60) -> bool:
     """Send a batch of events to the backend."""
     try:
         r = requests.post(

@@ -9,6 +9,7 @@ dist/
 build/
 
 # Environment files (NEVER commit secrets)
+**/.env
 .env
 .env.local
 .env.production

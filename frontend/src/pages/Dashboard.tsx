@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Activity, AlertTriangle, Shield, Wifi, WifiOff, Cpu, Eye, BarChart3,
-  Globe, Hexagon, Network, Brain } from 'lucide-react'
+import {
+  Activity, AlertTriangle, Shield, Wifi, WifiOff, Cpu, Eye, BarChart3,
+  Globe, Hexagon, Network, Brain
+} from 'lucide-react'
 import { useWebSocket, ThreatEvent } from '../hooks/useWebSocket'
 import ThreatFeed from '../components/ThreatFeed'
 import ThreatGauge from '../components/ThreatGauge'
@@ -52,8 +54,10 @@ export default function Dashboard() {
         ioc_matched: isIOC,
         ioc_matches: isIOC ? [{ type: 'ip', value: '45.33.32.156', confidence: 'critical' }] : [],
         mitre_techniques: isDanger && mitreMap[proc] ? mitreMap[proc] :
-          isWarning ? [{ id: 'T1059.004', name: 'Unix Shell', tactic: 'Execution',
-            description: 'Command interpreter', match_source: 'process' }] : [],
+          isWarning ? [{
+            id: 'T1059.004', name: 'Unix Shell', tactic: 'Execution',
+            description: 'Command interpreter', match_source: 'process'
+          }] : [],
         mitre_technique_count: isDanger ? 2 : isWarning ? 1 : 0,
         honeypot_hit: isHoneypot,
         ueba_score: isDanger ? 60 + Math.random() * 30 : Math.random() * 20,
