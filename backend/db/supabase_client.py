@@ -54,6 +54,11 @@ class MemoryStore:
         self.sessions = []
         self.audit_logs = []
         self.recent_events = []
+        # Advanced feature tables
+        self.action_ledger = []
+        self.honeypot_alerts = []
+        self.forensics_captures = []
+        self.federated_rounds = []
 
     def insert(self, table: str, data: dict):
         data["id"] = str(len(getattr(self, table, [])) + 1)

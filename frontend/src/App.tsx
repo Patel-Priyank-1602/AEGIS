@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Shield, Activity, FileText, Settings, LogOut, Zap } from 'lucide-react'
+import { Shield, Activity, FileText, Settings, LogOut, Zap, Globe, Cpu, Layers } from 'lucide-react'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 import Audit from './pages/Audit'
 import SettingsPage from './pages/Settings'
+import ThreatIntel from './pages/ThreatIntel'
+import Playbooks from './pages/Playbooks'
+import Features from './pages/Features'
 
-type Page = 'dashboard' | 'audit' | 'settings'
+type Page = 'dashboard' | 'audit' | 'settings' | 'threat-intel' | 'playbooks' | 'features'
 
 export default function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem('aegis_token'))
@@ -32,6 +35,9 @@ export default function App() {
 
   const navItems = [
     { id: 'dashboard' as Page, label: 'Dashboard', icon: Activity },
+    { id: 'threat-intel' as Page, label: 'Threat Intel', icon: Globe },
+    { id: 'playbooks' as Page, label: 'Playbooks', icon: Zap },
+    { id: 'features' as Page, label: 'All Features', icon: Layers },
     { id: 'audit' as Page, label: 'Audit Logs', icon: FileText },
     { id: 'settings' as Page, label: 'Settings', icon: Settings },
   ]
@@ -43,6 +49,11 @@ export default function App() {
         <div className="logo">
           <div className="logo-icon"><Shield size={18} /></div>
           <span className="logo-text">AEGIS</span>
+          <span style={{
+            fontSize: '0.5rem', fontWeight: 700, padding: '1px 5px', borderRadius: '4px',
+            background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(6,214,160,0.3))',
+            color: 'var(--accent)', marginLeft: '4px', letterSpacing: '0.05em',
+          }}>v2</span>
         </div>
 
         <nav style={{ flex: 1 }}>
@@ -71,7 +82,7 @@ export default function App() {
             <div>
               <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{username}</div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Zap size={10} /> ZK Authenticated
+                <Zap size={10} /> ZK + PQC Auth
               </div>
             </div>
           </div>
@@ -85,6 +96,9 @@ export default function App() {
       {/* Main Content */}
       <main className="main-content">
         {currentPage === 'dashboard' && <Dashboard />}
+        {currentPage === 'threat-intel' && <ThreatIntel />}
+        {currentPage === 'playbooks' && <Playbooks />}
+        {currentPage === 'features' && <Features />}
         {currentPage === 'audit' && <Audit />}
         {currentPage === 'settings' && <SettingsPage />}
       </main>

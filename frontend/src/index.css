@@ -49,6 +49,9 @@
   --glow-danger: 0 0 20px rgba(239, 68, 68, 0.2);
   --glass: rgba(13, 18, 37, 0.7);
   
+  /* ─── Shorthand ────────────────────────────────────────────── */
+  --accent: #06d6a0;
+  
   /* ─── Spacing & Radius ────────────────────────────────────── */
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -305,6 +308,14 @@ body::after {
 }
 
 .fade-in { animation: fadeIn 0.5s ease-out; }
+
+/* ─── Spin Animation ───────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin { animation: spin 1s linear infinite; }
 
 /* ─── Shimmer Loading ───────────────────────────────────────── */
 @keyframes shimmer {

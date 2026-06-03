@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 
+export interface MitreTechnique {
+  id: string
+  name: string
+  tactic: string
+  description: string
+  match_source: string
+}
+
 export interface ThreatEvent {
   pid: number
   process: string
@@ -10,6 +18,31 @@ export interface ThreatEvent {
   type: string
   ip: string
   port: number
+  // Threat Intel enrichment
+  ioc_matched?: boolean
+  ioc_matches?: { type: string; value: string; confidence: string }[]
+  ioc_confidence?: string
+  // MITRE ATT&CK enrichment
+  mitre_techniques?: MitreTechnique[]
+  mitre_technique_count?: number
+  mitre_tactic_count?: number
+  // Honeypot enrichment
+  honeypot_hit?: boolean
+  honeypot_alerts?: { type: string; resource: string }[]
+  // UEBA enrichment
+  ueba_score?: number
+  ueba_user?: string
+  ueba_risk_level?: string
+  // GNN enrichment
+  lateral_movement_detected?: boolean
+  lateral_detections?: { type: string; description: string }[]
+  // LLM explanation
+  explanation?: string
+  explanation_method?: string
+  // Forensics
+  forensics_capture_id?: string
+  // Playbook actions
+  playbook_actions?: any[]
 }
 
 interface UseWebSocketReturn {
@@ -45,8 +78,10 @@ export function useWebSocket(url: string): UseWebSocketReturn {
 
           // Browser notification for danger events
           if (event.threat_level === 'danger' && Notification.permission === 'granted') {
-            new Notification('⚠️ AEGIS Threat Alert', {
-              body: `Suspicious: ${event.process} (PID ${event.pid})\nScore: ${event.threat_score}/100\nFile: ${event.file || 'N/A'}`,
+            const extra = event.ioc_matched ? ' [IOC MATCH]' : 
+                         event.honeypot_hit ? ' [HONEYPOT]' : ''
+            new Notification(`⚠️ AEGIS Threat Alert${extra}`, {
+              body: `Suspicious: ${event.process} (PID ${event.pid})\nScore: ${event.threat_score}/100\n${event.mitre_techniques?.[0]?.id || ''} ${event.mitre_techniques?.[0]?.name || ''}`,
               icon: '/favicon.svg',
               tag: 'aegis-threat'
             })

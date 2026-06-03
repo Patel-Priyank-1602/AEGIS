@@ -13,3 +13,17 @@ scikit-learn==1.4.2
 pandas==2.2.2
 supabase==2.4.0
 joblib==1.4.2
+# ─── New Dependencies for Advanced Features ────────────
+# Threat Intel: Bloom filter (built-in, no extra package needed)
+# MITRE ATT&CK: Embedded database (no extra package needed)
+# Playbooks: APScheduler for scheduled tasks
+APScheduler==3.10.4
+# LLM: Ollama client (uses requests, already installed)
+# UEBA: Uses scikit-learn (already installed)
+# GNN: Graph analysis
+networkx==3.3
+# Federated Learning: Uses torch + numpy (already installed)
+# Post-Quantum Crypto: liboqs-python (optional — install if available)
+# pip install liboqs-python  # Uncomment on systems with liboqs installed
+# Memory Forensics: yara-python (optional — for real YARA scanning)
+# pip install yara-python  # Uncomment on Linux with libyara

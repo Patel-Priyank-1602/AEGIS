@@ -5,7 +5,7 @@
   <h3>Zero-Trust AI Security & Infrastructure Platform</h3>
 
   <p align="center">
-    <b>Next-Generation Threat Detection • Zero-Knowledge Authentication • Tamper-Proof Cryptography</b>
+    <b>Next-Generation Threat Detection • Zero-Knowledge Authentication • Tamper-Proof Cryptography • 10-Layer AI Defense Pipeline</b>
   </p>
 
   <p align="center">
@@ -58,9 +58,46 @@ AEGIS unifies four distinct, highly-complex computer science domains into a sing
 | Domain | Technology Stack | Purpose & Implementation | Key Files / Location |
 |--------|-----------------|--------------------------|----------------------|
 | **1. OS Kernel Telemetry** | eBPF + BCC + Python | Operates in kernel space. Intercepts file I/O, process execution (`execve`), and network connections invisibly. | `agent/agent.py` (eBPF hooks)<br>`agent/collector.py` |
-| **2. Artificial Intelligence** | PyTorch LSTM Autoencoder | Behavioral anomaly detection. Trains on sequence lengths of 20 system events to predict deviations. | `backend/ai/model.py` (PyTorch LSTM)<br>`backend/ai/trainer.py` |
-| **3. Cryptography & ZK** | circom + snarkjs + SHA-256 | Implements Poseidon hashing for fast ZK-SNARK circuit generation and secures the append-only audit log. | `zk/circuit.circom` (ZK Circuits)<br>`backend/crypto/audit_chain.py` |
-| **4. Web Command Center** | React 18 + FastAPI + WebSockets | High-performance, asynchronous streaming architecture for real-time threat visualization and network management. | `frontend/src/pages/Dashboard.tsx`<br>`backend/api/routes_ws.py` |
+| **2. Artificial Intelligence** | PyTorch LSTM & GNN | Behavioral anomaly detection (LSTM) and Lateral Movement detection (GNN). Detects zero-days and multi-hop network traversals. | `backend/ai/model.py`<br>`backend/gnn/graph_builder.py` |
+| **3. Cryptography & ZK** | circom + snarkjs + PQC | Implements ZK-SNARKs for passwordless auth, tamper-evident hash chaining, and Post-Quantum Cryptography (Dilithium/Kyber). | `backend/crypto/audit_chain.py`<br>`backend/crypto/pqc.py` |
+| **4. Enrichment & Response** | Python + Memory Forensics | 10-layer enrichment pipeline: Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, and LLM Explanations. | `backend/intel/`<br>`backend/playbooks/` |
+| **5. Web Command Center** | React 18 + FastAPI + WebSockets | High-performance dashboard featuring Live Event Feeds, Threat Intel panels, Playbook Managers, and a 10-feature unified status hub. | `frontend/src/pages/`<br>`backend/api/` |
+
+---
+
+## 🌟 Deep Dive: The V2.0 Ten-Layer Defense Pipeline
+
+AEGIS v2.0 introduces a massive, multi-staged security enrichment pipeline. When a raw OS telemetry event is intercepted by the kernel, it is piped through these 10 distinct micro-engines in real-time before being broadcasted to the Command Center:
+
+### 1. Threat Intel Feeds (O(1) Bloom Filters)
+Instead of executing slow database queries for every network event, AEGIS loads millions of known-bad IPs and Domains (from Abuse.ch Feodo Tracker, URLhaus, and SSLBL) into an in-memory **Bloom Filter**. This allows for `O(1)` constant-time lookups to instantly flag Command & Control (C2) server connections.
+
+### 2. MITRE ATT&CK Tagger
+AEGIS contains a localized heuristic engine that maps raw kernel events to specific **MITRE ATT&CK** tactics and techniques. For example, if a `bash` process spawns `nc` (netcat), the engine automatically tags the event with `T1059.004` (Unix Shell) and `T1095` (Non-Application Layer Protocol).
+
+### 3. Automated Playbooks & Action Ledger
+AEGIS doesn't just alert; it defends. If an event exceeds a critical threat threshold (e.g., Score > 90), the Playbook Engine executes automated response actions (like `isolate_host`, `kill_process`, or `block_ip`). Crucially, every action is recorded in a cryptographic **Action Ledger** with an "Undo Payload," allowing SOC analysts to mathematically reverse any false-positive defensive action with one click.
+
+### 4. Honeypot Deception Layer
+To eliminate false positives, AEGIS deploys "canary" files and decoy network ports across the host system. Legitimate software has no reason to interact with these decoys. If a process opens a honeypot file, the threat score instantly spikes to 100, bypassing the AI, as it guarantees unauthorized snooping or ransomware activity.
+
+### 5. Memory Forensics Scanner
+When high-severity processes are detected, AEGIS automatically dumps the active memory regions mapping (`/proc/PID/mem`). It then runs a high-speed string scanner against **YARA-style signatures** to search for in-memory footprints of known malware (e.g., Metasploit payloads, Cobalt Strike beacons) that avoid writing to the hard drive.
+
+### 6. LLM Alert Explainer (Ollama RAG)
+Instead of forcing analysts to decipher raw hex dumps and syscall IDs, AEGIS connects to a local, air-gapped Large Language Model (like **Qwen 2.5 Coder** via Ollama). The backend automatically feeds the event metadata and MITRE tags into a prompt, generating a plain-English, 3-sentence explanation of *what* the attacker did, and *what* to do next.
+
+### 7. UEBA (User & Entity Behavior Analytics)
+While the PyTorch LSTM models the entire system, the UEBA engine builds individual profiles for *every specific user* using **Isolation Forests**. It tracks login times, typical process trees, and resource consumption to identify insider threats (e.g., an accountant suddenly running `nmap` at 3:00 AM).
+
+### 8. GNN Lateral Movement Detection
+Standard AI only looks at one computer at a time. AEGIS uses **Graph Neural Networks (NetworkX & PyTorch Geometric)** to build a multi-hop graph of network connections. It analyzes the "edges" (connections) between "nodes" (hosts) to detect an attacker pivoting through the network (Host A -> Host B -> Host C) in an abnormally short time window.
+
+### 9. Privacy-Preserving Federated Learning
+In enterprise environments, sending sensitive behavioral data from employee laptops to a central cloud is a privacy risk. AEGIS utilizes **Federated Learning (FedAvg)**. The AI model is trained locally on the endpoint. Only the mathematical *weight updates* (with Laplace noise added for **Differential Privacy**, ε=0.1) are sent to the central server, merging into a global "Hive Mind" model without ever exposing user data.
+
+### 10. Post-Quantum Cryptography (NIST PQC)
+To future-proof the audit logs against quantum computers running Shor's algorithm, the AEGIS Zero-Knowledge authentication and Hash Chains are dual-signed. AEGIS implements the NIST-approved **Dilithium** algorithm for digital signatures and **Kyber** for key encapsulation, ensuring data captured today cannot be decrypted by quantum computers tomorrow.
 
 ---
 
@@ -181,11 +218,11 @@ By default, the backend falls back to rule-based threat scoring if an AI model i
 2. Open a **new terminal** in the `backend/` directory.
 3. **Download your collected telemetry** to use as baseline training data:
    ```bash
-   python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent', '../baseline_events.json')"
+   python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent?limit=1000', '../baseline_events.json')"
    ```
 4. **Train the LSTM Autoencoder:**
    ```bash
-   python -m ai.trainer ../baseline_events.json
+   python ai/trainer.py ../baseline_events.json
    ```
    *The system will process the sequences, train the PyTorch model for 100 epochs, and automatically save the `.pt` binary. The backend will instantly switch from rule-based scoring to AI predictions without requiring a restart!*
 
@@ -216,16 +253,24 @@ AEGIS/
 │   ├── agent.py              # True eBPF BCC kernel hook script (Linux)
 │   ├── agent_sim.py          # Cross-platform data & attack simulator
 │   └── collector.py          # Ring-buffer telemetry aggregation
-├── backend/                  # Application Logic Layer
-│   ├── ai/                   # PyTorch LSTM Autoencoder architecture & trainer
-│   ├── api/                  # FastAPI REST & WebSocket controllers
-│   ├── crypto/               # SHA-256 hashing & ZK-proof verification logic
-│   ├── db/                   # Supabase PostgreSQL ORM integration
-│   └── main.py               # Uvicorn entry point
+├── backend/                  # Application Logic Layer (The Brain)
+│   ├── ai/                   # PyTorch LSTM Autoencoder (Baseline Anomaly Detection)
+│   ├── api/                  # FastAPI REST & WebSocket controllers (10-layer middleware)
+│   ├── crypto/               # ZK-proof verification, SHA-256 chaining & Post-Quantum Cryptography
+│   ├── db/                   # Supabase PostgreSQL ORM & in-memory fallback
+│   ├── federated/            # Federated Learning Server (Differential Privacy aggregation)
+│   ├── forensics/            # Automated memory dumping (`/proc/PID/mem`) & YARA signature scanning
+│   ├── gnn/                  # Graph Neural Network builder for Lateral Movement detection
+│   ├── honeypot/             # Deception infrastructure manager (Decoy files, canary ports)
+│   ├── intel/                # O(1) Bloom Filter Threat Feeds & MITRE ATT&CK Tagger
+│   ├── llm/                  # RAG-based Alert Explainer connecting to local Ollama (Qwen)
+│   ├── playbooks/            # Automated Response Engine & reversible Action Ledger
+│   ├── ueba/                 # User & Entity Behavior Analytics (Isolation Forest profiling)
+│   └── main.py               # Uvicorn entry point orchestrating all 10 modules
 ├── frontend/                 # Presentation Layer
 │   ├── src/components/       # Real-time Threat Gauges, Recharts, Event Feeds
 │   ├── src/hooks/            # useWebSocket & useZKAuth custom hooks
-│   └── src/pages/            # Dashboard, Audit Chain, and Auth interfaces
+│   └── src/pages/            # Dashboard, Threat Intel, Playbooks, Features, and Auth interfaces
 └── zk/                       # Zero-Knowledge Circuit Definitions
     └── circuit.circom        # Poseidon hash proving circuits (circom)
 ```
