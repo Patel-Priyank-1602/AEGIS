@@ -4,6 +4,9 @@ Trains the LSTM Autoencoder on baseline (normal) system behavior data.
 The model learns to perfectly reconstruct normal event sequences.
 When deployed, events it cannot reconstruct well are flagged as anomalous.
 """
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 import torch.nn as nn

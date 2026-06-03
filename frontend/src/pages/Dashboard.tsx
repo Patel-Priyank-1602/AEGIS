@@ -33,7 +33,7 @@ export default function Dashboard() {
           : files[Math.floor(Math.random() * files.length)],
         threat_score: isDanger ? 75 + Math.random() * 25
           : isWarning ? 35 + Math.random() * 30
-          : Math.random() * 25,
+            : Math.random() * 25,
         threat_level: isDanger ? 'danger' : isWarning ? 'warning' : 'safe',
         timestamp: new Date().toISOString(),
         type: Math.random() > 0.3 ? 'file_open' : 'process_exec',
