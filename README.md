@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/shield-alert.svg" alt="AEGIS Logo" width="120" height="120" />
+  <img src="frontend/public/favicon.png" alt="AEGIS Logo" width="120" height="120" />
   
   <h1 style="border-bottom: none;">AEGIS</h1>
   <h3>Zero-Trust AI Security & Infrastructure Platform</h3>
