@@ -51,6 +51,10 @@ Where traditional cybersecurity fails, AEGIS thrives:
 
 ## 🏗️ Architecture
 
+<div align="center">
+  <img src="frontend/public/img.png" alt="AEGIS System Architecture Diagram" width="100%" />
+</div>
+
 AEGIS converges four distinct, highly-complex computer science domains into a single, unbreakable platform:
 
 | Domain | Technology Stack | Purpose & Implementation |
