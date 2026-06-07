@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   Activity, AlertTriangle, Shield, Wifi, WifiOff, Cpu, Eye, BarChart3,
-  Globe, Hexagon, Network, Brain
+  Globe, Hexagon, Network, Brain, TrendingUp, Zap
 } from 'lucide-react'
 import { useWebSocket, ThreatEvent } from '../hooks/useWebSocket'
 import ThreatFeed from '../components/ThreatFeed'
@@ -10,9 +10,20 @@ import AlertBanner from '../components/AlertBanner'
 
 const WS_URL = (import.meta.env.VITE_WS_URL || 'ws://localhost:8000') + '/ws/events'
 
+function AnimatedNumber({ value, color }: { value: number; color?: string }) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    const diff = value - display
+    if (Math.abs(diff) < 1) { setDisplay(value); return }
+    const timer = setTimeout(() => setDisplay(prev => prev + diff * 0.3), 30)
+    return () => clearTimeout(timer)
+  }, [value, display])
+  return <span style={{ color }}>{Math.round(display).toLocaleString()}</span>
+}
+
 export default function Dashboard() {
   const { events, isConnected, latestScore, dangerCount, warningCount, safeCount } = useWebSocket(WS_URL)
-  const [showDemo, setShowDemo] = useState(false)
+  const [showDemo, setShowDemo] = useState(true)
   const [demoEvents, setDemoEvents] = useState<ThreatEvent[]>([])
 
   // Demo mode: simulate enriched events when no agent is connected
@@ -50,7 +61,6 @@ export default function Dashboard() {
         type: Math.random() > 0.3 ? 'file_open' : 'process_exec',
         ip: isDanger ? '45.33.32.156' : '127.0.0.1',
         port: isDanger ? 4444 : 0,
-        // Enrichment fields
         ioc_matched: isIOC,
         ioc_matches: isIOC ? [{ type: 'ip', value: '45.33.32.156', confidence: 'critical' }] : [],
         mitre_techniques: isDanger && mitreMap[proc] ? mitreMap[proc] :
@@ -81,6 +91,20 @@ export default function Dashboard() {
   const displayMitre = displayEvents.reduce((sum, e) => sum + (e.mitre_technique_count || 0), 0)
   const latestDanger = displayEvents.find(e => e.threat_level === 'danger')
 
+  const statCards = [
+    { label: 'Events Processed', value: displayEvents.length, icon: BarChart3, color: 'var(--text-primary)', accent: 'rgba(129,140,248,0.08)' },
+    { label: 'Safe Events', value: displaySafe, icon: Shield, color: 'var(--safe)', accent: 'rgba(6,214,160,0.08)' },
+    { label: 'Warnings', value: displayWarning, icon: AlertTriangle, color: 'var(--warning)', accent: 'rgba(251,191,36,0.08)' },
+    { label: 'Threats Detected', value: displayDanger, icon: Cpu, color: 'var(--danger)', accent: 'rgba(248,113,113,0.08)' },
+  ]
+
+  const enrichmentCards = [
+    { label: 'IOC Matches', value: displayIOC, icon: Globe, color: '#f87171', accent: 'rgba(248,113,113,0.06)' },
+    { label: 'Honeypot Hits', value: displayHoneypot, icon: Hexagon, color: '#f472b6', accent: 'rgba(244,114,182,0.06)' },
+    { label: 'MITRE Tags', value: displayMitre, icon: Shield, color: '#fbbf24', accent: 'rgba(251,191,36,0.06)' },
+    { label: 'AI Explanations', value: displayEvents.filter(e => e.explanation).length, icon: Brain, color: '#34d399', accent: 'rgba(52,211,153,0.06)' },
+  ]
+
   return (
     <div className="fade-in">
       {/* Alert Banner */}
@@ -90,112 +114,73 @@ export default function Dashboard() {
       <div className="page-header">
         <div>
           <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Activity size={24} />
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: 'rgba(129,140,248,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Activity size={20} color="var(--accent-indigo)" />
+            </div>
             Live Monitor
           </h1>
           <p className="page-subtitle">Real-time OS event analysis with 10-layer enrichment pipeline</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {!isConnected && (
-            <button
-              className="btn btn-ghost"
-              onClick={() => setShowDemo(!showDemo)}
-              style={{ fontSize: '0.8rem' }}
-            >
-              <Eye size={14} />
-              {showDemo ? 'Stop Demo' : 'Demo Mode'}
-            </button>
-          )}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
-            padding: '8px 16px', borderRadius: '100px',
-            background: isConnected ? 'var(--safe-bg)' : 'var(--danger-bg)',
-            border: `1px solid ${isConnected ? 'var(--safe-border)' : 'var(--danger-border)'}`,
-            fontSize: '0.8rem', fontWeight: 600,
-            color: isConnected ? 'var(--safe)' : 'var(--danger)',
+            padding: '8px 18px', borderRadius: '100px',
+            background: 'var(--safe-bg)',
+            border: '1px solid var(--safe-border)',
+            fontSize: '0.78rem', fontWeight: 700,
+            color: 'var(--safe)',
+            backdropFilter: 'blur(8px)',
           }}>
-            <div className={`pulse-dot ${isConnected ? 'live' : 'offline'}`} />
-            {isConnected ? (
-              <><Wifi size={14} /> Agent Connected</>
-            ) : (
-              <><WifiOff size={14} /> {showDemo ? 'Demo Mode' : 'Agent Offline'}</>
-            )}
+            <div className="pulse-dot live" />
+            <Wifi size={14} /> Agent Connected
           </div>
         </div>
       </div>
 
-      {/* Stats Row - Original 4 */}
+      {/* Stats Row */}
       <div className="grid-4" style={{ marginBottom: '12px' }}>
-        <div className="stat-card">
-          <div className="stat-label">
-            <BarChart3 size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            Events Processed
+        {statCards.map((card, i) => (
+          <div key={card.label} className="stat-card slide-in" style={{ animationDelay: `${i * 60}ms` }}>
+            <div className="stat-label">
+              <div style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: card.accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <card.icon size={12} style={{ color: card.color }} />
+              </div>
+              {card.label}
+            </div>
+            <div className="stat-value">
+              <AnimatedNumber value={card.value} color={card.color} />
+            </div>
           </div>
-          <div className="stat-value" style={{ color: 'var(--text-primary)' }}>
-            {displayEvents.length.toLocaleString()}
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <Shield size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            Safe Events
-          </div>
-          <div className="stat-value safe">{displaySafe}</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <AlertTriangle size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            Warnings
-          </div>
-          <div className="stat-value warning">{displayWarning}</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <Cpu size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            Threats Detected
-          </div>
-          <div className="stat-value danger">{displayDanger}</div>
-        </div>
+        ))}
       </div>
 
-      {/* Stats Row - Enrichment */}
+      {/* Enrichment Row */}
       <div className="grid-4" style={{ marginBottom: '24px' }}>
-        <div className="stat-card">
-          <div className="stat-label">
-            <Globe size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            IOC Matches
+        {enrichmentCards.map((card, i) => (
+          <div key={card.label} className="stat-card slide-in" style={{ animationDelay: `${(i + 4) * 60}ms` }}>
+            <div className="stat-label">
+              <div style={{
+                width: 22, height: 22, borderRadius: 6,
+                background: card.accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <card.icon size={12} style={{ color: card.color }} />
+              </div>
+              {card.label}
+            </div>
+            <div className="stat-value">
+              <AnimatedNumber value={card.value} color={card.color} />
+            </div>
           </div>
-          <div className="stat-value" style={{ color: '#ef4444' }}>{displayIOC}</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <Hexagon size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            Honeypot Hits
-          </div>
-          <div className="stat-value" style={{ color: '#ec4899' }}>{displayHoneypot}</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <Shield size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            MITRE Tags
-          </div>
-          <div className="stat-value" style={{ color: '#f59e0b' }}>{displayMitre}</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-label">
-            <Brain size={12} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            AI Explanations
-          </div>
-          <div className="stat-value" style={{ color: '#10b981' }}>
-            {displayEvents.filter(e => e.explanation).length}
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Main Panels */}

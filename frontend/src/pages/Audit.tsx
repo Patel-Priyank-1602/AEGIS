@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FileText, ShieldCheck, ShieldAlert, Download, RefreshCw, Lock, Unlock, Trash2, Info } from 'lucide-react'
+import { FileText, ShieldCheck, ShieldAlert, Download, RefreshCw, Lock, Unlock, Trash2, Info, ChevronDown, ChevronUp, Link2 } from 'lucide-react'
 import { api } from '../services/api'
 
 interface AuditEntry {
@@ -127,7 +127,13 @@ export default function Audit() {
       <div className="page-header">
         <div>
           <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <FileText size={24} />
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: 'rgba(129,140,248,0.1)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <FileText size={20} color="var(--accent-indigo)" />
+            </div>
             Audit Log Chain
           </h1>
           <p className="page-subtitle">Tamper-proof SHA-256 hash chain with AES-256 encryption</p>
@@ -138,25 +144,18 @@ export default function Audit() {
             {decrypted ? 'Encrypted' : 'Decrypt'}
           </button>
           <button className="btn btn-ghost" onClick={loadLogs}>
-            <RefreshCw size={14} />
-            Refresh
+            <RefreshCw size={14} /> Refresh
           </button>
           <button className="btn btn-ghost" onClick={exportReport}>
-            <Download size={14} />
-            Export
+            <Download size={14} /> Export
           </button>
-          <button
-            className="btn btn-ghost"
-            onClick={clearLogs}
-            disabled={clearing}
-            style={{ color: 'var(--danger)' }}
-          >
+          <button className="btn btn-ghost" onClick={clearLogs} disabled={clearing}
+            style={{ color: 'var(--danger)' }}>
             <Trash2 size={14} />
-            {clearing ? 'Clearing...' : 'Clear Logs'}
+            {clearing ? 'Clearing...' : 'Clear'}
           </button>
           <button className="btn btn-primary" onClick={verifyChain}>
-            <ShieldCheck size={14} />
-            Verify Chain
+            <ShieldCheck size={14} /> Verify Chain
           </button>
         </div>
       </div>
@@ -165,41 +164,57 @@ export default function Audit() {
       <div
         onClick={() => setShowInfo(!showInfo)}
         style={{
-          padding: '12px 16px', borderRadius: 'var(--radius-md)', marginBottom: '16px',
-          background: 'rgba(99,102,241,0.06)', border: '1px solid var(--border)',
+          padding: '14px 18px', borderRadius: 'var(--radius-md)', marginBottom: '16px',
+          background: 'rgba(129,140,248,0.04)', border: '1px solid var(--border)',
           cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
           fontSize: '0.8rem', color: 'var(--text-secondary)',
+          transition: 'all 0.2s',
         }}
       >
-        <Info size={16} style={{ flexShrink: 0, color: 'var(--primary)' }} />
-        <span>
-          <strong>What is this page?</strong> {showInfo ? 'Click to collapse ▲' : 'Click to learn about Verify Chain and Chain Links ▼'}
+        <div style={{
+          width: 28, height: 28, borderRadius: 7,
+          background: 'rgba(129,140,248,0.08)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <Info size={14} color="var(--accent-indigo)" />
+        </div>
+        <span style={{ flex: 1 }}>
+          <strong>What is this page?</strong> Click to learn about Verify Chain and Chain Links
         </span>
+        {showInfo ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </div>
       {showInfo && (
         <div className="slide-in" style={{
-          padding: '20px', borderRadius: 'var(--radius-md)', marginBottom: '20px',
-          background: 'rgba(99,102,241,0.04)', border: '1px solid var(--border)',
+          padding: '22px', borderRadius: 'var(--radius-md)', marginBottom: '20px',
+          background: 'rgba(129,140,248,0.03)', border: '1px solid var(--border)',
           fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.8,
         }}>
-          <div style={{ marginBottom: '12px' }}>
-            <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>🔗 What is a Chain Link?</strong><br />
-            Each audit entry contains a <code>previous_hash</code> field that stores the SHA-256 hash of the entry before it.
-            This creates a <strong>blockchain-like chain</strong>. If someone modifies an old entry (e.g. changing a "danger" to "safe"),
-            its hash changes, which breaks the link for every entry after it. The "Chain Link" column shows whether each entry
-            correctly points to the entry before it.
+          <div style={{ marginBottom: '14px' }}>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Link2 size={14} color="var(--accent-indigo)" /> What is a Chain Link?
+            </strong>
+            <div style={{ marginTop: '4px' }}>
+              Each audit entry contains a <code style={{ padding: '1px 6px', borderRadius: '4px', background: 'rgba(129,140,248,0.08)', fontSize: '0.78rem' }}>previous_hash</code> field that stores the SHA-256 hash of the entry before it.
+              This creates a <strong>blockchain-like chain</strong>. If someone modifies an old entry, its hash changes, which breaks the link for every entry after it.
+            </div>
           </div>
-          <div style={{ marginBottom: '12px' }}>
-            <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>✅ What does "Verify Chain" do?</strong><br />
-            It walks through <strong>every entry</strong> from the oldest to the newest and checks that the chain is unbroken.
-            If all links are valid, it proves that <strong>no entry has been tampered with</strong> since it was created.
-            This is critical for compliance, forensic audits, and legal evidence.
+          <div style={{ marginBottom: '14px' }}>
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ShieldCheck size={14} color="var(--safe)" /> What does "Verify Chain" do?
+            </strong>
+            <div style={{ marginTop: '4px' }}>
+              It walks through <strong>every entry</strong> from the oldest to the newest and checks that the chain is unbroken.
+              This proves that <strong>no entry has been tampered with</strong> since it was created.
+            </div>
           </div>
           <div>
-            <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>🔐 Why are entries encrypted?</strong><br />
-            All event data is encrypted with <strong>AES-256 (Fernet)</strong> before storage. Even if someone gains access to
-            the database, they cannot read the content without the <code>AUDIT_ENCRYPTION_KEY</code>.
-            Click "Decrypt" to view the plaintext process names, file paths, and scores.
+            <strong style={{ color: 'var(--text-primary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Lock size={14} color="var(--warning)" /> Why are entries encrypted?
+            </strong>
+            <div style={{ marginTop: '4px' }}>
+              All event data is encrypted with <strong>AES-256 (Fernet)</strong> before storage. Click "Decrypt" to view the plaintext process names, file paths, and scores.
+            </div>
           </div>
         </div>
       )}
@@ -207,42 +222,45 @@ export default function Audit() {
       {/* Verification Result */}
       {chainValid !== null && (
         <div className="slide-in" style={{
-          padding: '16px 20px', borderRadius: 'var(--radius-md)', marginBottom: '20px',
-          display: 'flex', alignItems: 'center', gap: '12px',
+          padding: '16px 22px', borderRadius: 'var(--radius-md)', marginBottom: '20px',
+          display: 'flex', alignItems: 'center', gap: '14px',
           background: chainValid ? 'var(--safe-bg)' : 'var(--danger-bg)',
           border: `1px solid ${chainValid ? 'var(--safe-border)' : 'var(--danger-border)'}`,
+          backdropFilter: 'blur(8px)',
         }}>
-          {chainValid ? <ShieldCheck size={20} color="var(--safe)" /> : <ShieldAlert size={20} color="var(--danger)" />}
+          <div style={{
+            width: 36, height: 36, borderRadius: 10,
+            background: chainValid ? 'rgba(6,214,160,0.1)' : 'rgba(248,113,113,0.1)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            {chainValid ? <ShieldCheck size={18} color="var(--safe)" /> : <ShieldAlert size={18} color="var(--danger)" />}
+          </div>
           <div>
-            <div style={{ fontWeight: 600, color: chainValid ? 'var(--safe)' : 'var(--danger)' }}>
-              {chainValid ? 'Chain Integrity Verified ✓' : 'Chain Tampering Detected!'}
+            <div style={{ fontWeight: 700, color: chainValid ? 'var(--safe)' : 'var(--danger)', fontSize: '0.9rem' }}>
+              {chainValid ? 'Chain Integrity Verified' : 'Chain Tampering Detected!'}
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{verifyMessage}</div>
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{verifyMessage}</div>
           </div>
         </div>
       )}
 
       {/* Stats Summary */}
       {entries.length > 0 && (
-        <div style={{
-          display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap',
-        }}>
-          <div className="stat-card" style={{ flex: 1, minWidth: '120px' }}>
-            <div className="stat-label">Total Entries</div>
-            <div className="stat-value" style={{ color: 'var(--text-primary)' }}>{entries.length}</div>
-          </div>
-          <div className="stat-card" style={{ flex: 1, minWidth: '120px' }}>
-            <div className="stat-label">🔴 Danger</div>
-            <div className="stat-value danger">{dangerCount}</div>
-          </div>
-          <div className="stat-card" style={{ flex: 1, minWidth: '120px' }}>
-            <div className="stat-label">🟡 Warning</div>
-            <div className="stat-value warning">{warningCount}</div>
-          </div>
-          <div className="stat-card" style={{ flex: 1, minWidth: '120px' }}>
-            <div className="stat-label">🟢 Safe</div>
-            <div className="stat-value safe">{safeCount}</div>
-          </div>
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Total Entries', value: entries.length, color: 'var(--text-primary)', bg: 'rgba(129,140,248,0.06)' },
+            { label: 'Danger', value: dangerCount, color: 'var(--danger)', bg: 'rgba(248,113,113,0.06)' },
+            { label: 'Warning', value: warningCount, color: 'var(--warning)', bg: 'rgba(251,191,36,0.06)' },
+            { label: 'Safe', value: safeCount, color: 'var(--safe)', bg: 'rgba(6,214,160,0.06)' },
+          ].map(stat => (
+            <div key={stat.label} className="stat-card" style={{ flex: 1, minWidth: '120px' }}>
+              <div className="stat-label">
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: stat.color }} />
+                {stat.label}
+              </div>
+              <div className="stat-value" style={{ color: stat.color }}>{stat.value}</div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -267,13 +285,20 @@ export default function Audit() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i}>
                     <td colSpan={decrypted ? 8 : 6}>
-                      <div className="shimmer" style={{ height: '20px', width: '100%' }} />
+                      <div className="shimmer" style={{ height: '22px', width: '100%' }} />
                     </td>
                   </tr>
                 ))
               ) : entries.length === 0 ? (
                 <tr>
-                  <td colSpan={decrypted ? 8 : 6} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                  <td colSpan={decrypted ? 8 : 6} style={{ textAlign: 'center', padding: '48px', color: 'var(--text-muted)' }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12, margin: '0 auto 12px',
+                      background: 'rgba(129,140,248,0.06)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <FileText size={20} color="var(--text-muted)" />
+                    </div>
                     No audit entries yet. Start the agent to generate threat events.
                   </td>
                 </tr>
@@ -281,7 +306,7 @@ export default function Audit() {
                 entries.map((entry, i) => {
                   const linked = isChainLinked(entry, i)
                   return (
-                    <tr key={entry.id || i} className="slide-in" style={{ animationDelay: `${i * 30}ms` }}>
+                    <tr key={entry.id || i} className="slide-in" style={{ animationDelay: `${i * 25}ms` }}>
                       <td className="mono" style={{ color: 'var(--text-muted)' }}>{entries.length - i}</td>
                       <td style={{ fontSize: '0.8rem' }}>
                         {new Date(entry.created_at).toLocaleString()}
@@ -291,16 +316,22 @@ export default function Audit() {
                         {entry.hash}
                       </td>
                       <td className="mono" style={{ fontSize: '0.7rem', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-muted)' }}>
-                        {entry.previous_hash === '0'.repeat(64) ? '🏁 GENESIS' : entry.previous_hash.slice(0, 16) + '...'}
+                        {entry.previous_hash === '0'.repeat(64) ? (
+                          <span style={{
+                            padding: '2px 8px', borderRadius: '4px',
+                            background: 'rgba(129,140,248,0.08)',
+                            color: 'var(--accent-indigo)', fontSize: '0.68rem', fontWeight: 700,
+                          }}>GENESIS</span>
+                        ) : entry.previous_hash.slice(0, 16) + '...'}
                       </td>
                       {decrypted && entry.decrypted_content && (
                         <>
-                          <td className="mono">{entry.decrypted_content.process || '—'}</td>
+                          <td className="mono" style={{ fontWeight: 600 }}>{entry.decrypted_content.process || '—'}</td>
                           <td>
                             <span style={{
                               color: (entry.decrypted_content.threat_score || 0) > 70 ? 'var(--danger)'
                                 : (entry.decrypted_content.threat_score || 0) > 30 ? 'var(--warning)' : 'var(--safe)',
-                              fontFamily: 'var(--font-mono)', fontWeight: 600,
+                              fontFamily: 'var(--font-mono)', fontWeight: 700,
                             }}>
                               {Math.round(entry.decrypted_content.threat_score || 0)}
                             </span>
@@ -310,17 +341,23 @@ export default function Audit() {
                       <td style={{ textAlign: 'center' }}>
                         {linked ? (
                           <span style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            color: 'var(--safe)', fontSize: '0.75rem', fontWeight: 600,
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            color: 'var(--safe)', fontSize: '0.72rem', fontWeight: 700,
+                            padding: '3px 10px', borderRadius: '100px',
+                            background: 'rgba(6,214,160,0.06)',
+                            border: '1px solid rgba(6,214,160,0.12)',
                           }}>
-                            🔗 Valid
+                            <Link2 size={11} /> Valid
                           </span>
                         ) : (
                           <span style={{
-                            display: 'inline-flex', alignItems: 'center', gap: '4px',
-                            color: 'var(--danger)', fontSize: '0.75rem', fontWeight: 600,
+                            display: 'inline-flex', alignItems: 'center', gap: '5px',
+                            color: 'var(--danger)', fontSize: '0.72rem', fontWeight: 700,
+                            padding: '3px 10px', borderRadius: '100px',
+                            background: 'rgba(248,113,113,0.06)',
+                            border: '1px solid rgba(248,113,113,0.12)',
                           }}>
-                            ⛓️‍💥 Broken
+                            <ShieldAlert size={11} /> Broken
                           </span>
                         )}
                       </td>
