@@ -23,12 +23,14 @@ function AnimatedNumber({ value, color }: { value: number; color?: string }) {
 
 export default function Dashboard() {
   const { events, isConnected, latestScore, dangerCount, warningCount, safeCount } = useWebSocket(WS_URL)
-  const [showDemo, setShowDemo] = useState(true)
+  const [forceDemo, setForceDemo] = useState(false)
   const [demoEvents, setDemoEvents] = useState<ThreatEvent[]>([])
 
-  // Demo mode: simulate enriched events when no agent is connected
+  const effectiveIsConnected = isConnected && !forceDemo
+
+  // Demo mode: simulate enriched events ONLY when forceDemo is explicitly active
   useEffect(() => {
-    if (isConnected || !showDemo) return
+    if (!forceDemo) return
 
     const processes = ['code', 'python3', 'node', 'git', 'chrome', 'docker', 'npm', 'systemd']
     const files = ['/home/user/project/app.py', '/tmp/build.log', '/home/user/.config/settings.json', '/var/log/syslog']
@@ -79,9 +81,9 @@ export default function Dashboard() {
     }, 800)
 
     return () => clearInterval(interval)
-  }, [isConnected, showDemo])
+  }, [forceDemo])
 
-  const displayEvents = isConnected ? events : demoEvents
+  const displayEvents = forceDemo ? demoEvents : events
   const displayScore = displayEvents[0]?.threat_score ?? 0
   const displayDanger = displayEvents.filter(e => e.threat_level === 'danger').length
   const displayWarning = displayEvents.filter(e => e.threat_level === 'warning').length
@@ -126,17 +128,35 @@ export default function Dashboard() {
           <p className="page-subtitle">Real-time OS event analysis with 10-layer enrichment pipeline</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={() => setForceDemo(!forceDemo)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px', borderRadius: '100px',
+              background: forceDemo ? 'rgba(129, 140, 248, 0.1)' : 'transparent',
+              border: `1px solid ${forceDemo ? 'rgba(129, 140, 248, 0.3)' : 'var(--border)'}`,
+              color: forceDemo ? 'var(--accent-indigo)' : 'var(--text-muted)',
+              fontSize: '0.78rem', fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Zap size={14} />
+            Demo Mode {forceDemo ? 'Active' : 'Off'}
+          </button>
+
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
             padding: '8px 18px', borderRadius: '100px',
-            background: 'var(--safe-bg)',
-            border: '1px solid var(--safe-border)',
+            background: effectiveIsConnected ? 'var(--safe-bg)' : 'rgba(248, 113, 113, 0.05)',
+            border: effectiveIsConnected ? '1px solid var(--safe-border)' : '1px solid rgba(248, 113, 113, 0.2)',
             fontSize: '0.78rem', fontWeight: 700,
-            color: 'var(--safe)',
+            color: effectiveIsConnected ? 'var(--safe)' : 'var(--danger)',
             backdropFilter: 'blur(8px)',
           }}>
-            <div className="pulse-dot live" />
-            <Wifi size={14} /> Agent Connected
+            <div className={`pulse-dot ${effectiveIsConnected ? 'live' : ''}`} style={!effectiveIsConnected ? { background: 'var(--danger)', boxShadow: '0 0 8px var(--danger)' } : {}} />
+            {effectiveIsConnected ? <Wifi size={14} /> : <WifiOff size={14} />} 
+            {effectiveIsConnected ? 'Agent Connected' : 'Agent Offline'}
           </div>
         </div>
       </div>

@@ -1,11 +1,15 @@
 <div align="center">
-  <img src="frontend/public/favicon.png" alt="AEGIS Logo" width="120" height="120" />
+  <img src="frontend/public/favicon.png" alt="AEGIS Logo" width="150" height="150" />
   
-  <h1 style="border-bottom: none;">AEGIS</h1>
-  <h3>Zero-Trust AI Security & Infrastructure Platform</h3>
+  <h1 style="border-bottom: none; font-size: 3em; margin-top: 20px;">A E G I S</h1>
+  <p><b>Advanced Zero-Trust AI Security & Infrastructure Platform</b></p>
 
   <p align="center">
-    <b>Next-Generation Threat Detection • Zero-Knowledge Authentication • Tamper-Proof Cryptography • 10-Layer AI Defense Pipeline</b>
+    <a href="#-the-philosophy-why-aegis">Philosophy</a> •
+    <a href="#-architecture">Architecture</a> •
+    <a href="#-the-ten-layer-defense-pipeline">Defense Pipeline</a> •
+    <a href="#-data-flow--diagrams">Data Flow</a> •
+    <a href="#-installation--deployment">Installation</a>
   </p>
 
   <p align="center">
@@ -18,160 +22,161 @@
     <img src="https://img.shields.io/badge/circom-ZK_SNARKs-FFB000?style=for-the-badge" alt="Circom" />
     <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
   </p>
+  
+  <p align="center">
+    <i>Next-Generation Threat Detection • Zero-Knowledge Authentication • Tamper-Proof Cryptography • 10-Layer AI Defense Pipeline</i>
+  </p>
 </div>
 
----
-
-## 📑 Table of Contents
-1. [The Philosophy: Why AEGIS?](#-the-philosophy-why-aegis)
-2. [Core Architecture](#-core-architecture)
-3. [Deep Dive: System Components](#-deep-dive-system-components)
-4. [Data Flow & Diagrams](#-data-flow--diagrams)
-5. [Installation & Deployment](#-installation--deployment)
-6. [AI Training Pipeline](#-ai-training-pipeline)
-7. [Environment Configuration](#-environment-configuration)
-8. [API Reference](#-api-reference)
-9. [Development & Architecture Decisions](#-development--architecture-decisions)
-
----
+<br/>
 
 ## 🛡️ The Philosophy: Why AEGIS?
 
-Modern enterprise environments are failing against zero-day exploits, credential theft, and insider threats. AEGIS was engineered from the ground up to eliminate these vulnerabilities by assuming **nothing is safe** (Zero-Trust). 
+Modern enterprise environments are failing against zero-day exploits, credential theft, and insider threats. Traditional perimeter defense is obsolete. AEGIS was engineered from the ground up to eliminate these vulnerabilities by assuming **nothing is safe**—a true Zero-Trust architecture. 
 
 Where traditional cybersecurity fails, AEGIS thrives:
-*   **Death to Signatures:** Antiviruses look for known bad files. AEGIS uses a local **PyTorch LSTM Neural Network** to understand your system's normal behavior. If an attacker uses a novel zero-day exploit, the statistical deviation immediately flags it as an anomaly.
-*   **Death to Passwords:** Attackers steal passwords and hashes. AEGIS users authenticate via **Zero-Knowledge Proofs (ZK-SNARKs)**, mathematically proving they know their credential without ever transmitting it across the network.
-*   **Death to Log Tampering:** Hackers delete logs to hide their tracks. AEGIS uses a **Cryptographic SHA-256 Hash Chain** (Write-Once-Read-Many). If a single event is deleted or modified in the database, the cryptographic chain is broken, instantly alerting administrators to the compromise.
 
-### 🏢 Prime Use Cases
-- **Cloud Infrastructure Monitoring:** Deploy the lightweight eBPF agent on Kubernetes nodes to monitor raw kernel syscalls with near-zero CPU overhead.
-- **Financial & Healthcare Systems:** Guarantee strict regulatory compliance (HIPAA, SOC2) using the tamper-proof cryptographic audit log.
-- **Zero-Trust Corporate Endpoints:** Monitor developer machines for rogue processes, unauthorized network sockets, and privilege escalation attacks.
+*   **Behavioral Dominance (Death to Signatures):** Legacy antiviruses look for known bad files. AEGIS utilizes a local **PyTorch LSTM Neural Network** to map and understand your system's normal behavior at a granular level. If an attacker leverages a novel zero-day exploit, the statistical deviation instantly flags it as an anomaly.
+*   **Cryptographic Identity (Death to Passwords):** Attackers steal passwords and crack hashes. AEGIS users authenticate via **Zero-Knowledge Proofs (ZK-SNARKs)**, mathematically proving they know their credential without ever transmitting the secret across the network.
+*   **Immutable Forensics (Death to Log Tampering):** Hackers delete logs to hide their tracks. AEGIS secures telemetry using a **Cryptographic SHA-256 Hash Chain** (Write-Once-Read-Many). Modifying a single historical event breaks the cryptographic chain, instantly alerting administrators to the compromise.
 
----
-
-## 🏗️ Core Architecture
-
-AEGIS unifies four distinct, highly-complex computer science domains into a single resilient platform:
-
-| Domain | Technology Stack | Purpose & Implementation | Key Files / Location |
-|--------|-----------------|--------------------------|----------------------|
-| **1. OS Kernel Telemetry** | eBPF + BCC + Python | Operates in kernel space. Intercepts file I/O, process execution (`execve`), and network connections invisibly. | `agent/agent.py` (eBPF hooks)<br>`agent/collector.py` |
-| **2. Artificial Intelligence** | PyTorch LSTM & GNN | Behavioral anomaly detection (LSTM) and Lateral Movement detection (GNN). Detects zero-days and multi-hop network traversals. | `backend/ai/model.py`<br>`backend/gnn/graph_builder.py` |
-| **3. Cryptography & ZK** | circom + snarkjs + PQC | Implements ZK-SNARKs for passwordless auth, tamper-evident hash chaining, and Post-Quantum Cryptography (Dilithium/Kyber). | `backend/crypto/audit_chain.py`<br>`backend/crypto/pqc.py` |
-| **4. Enrichment & Response** | Python + Memory Forensics | 10-layer enrichment pipeline: Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, and LLM Explanations. | `backend/intel/`<br>`backend/playbooks/` |
-| **5. Web Command Center** | React 18 + FastAPI + WebSockets | High-performance dashboard featuring Live Event Feeds, Threat Intel panels, Playbook Managers, and a 10-feature unified status hub. | `frontend/src/pages/`<br>`backend/api/` |
+### 🏢 Enterprise Use Cases
+> **Cloud Infrastructure Monitoring:** Deploy the lightweight eBPF agent on Kubernetes nodes to monitor raw kernel syscalls with near-zero CPU overhead.
+> 
+> **Financial & Healthcare Systems:** Guarantee strict regulatory compliance (HIPAA, SOC2, PCI-DSS) using the tamper-proof cryptographic audit ledger.
+> 
+> **Zero-Trust Corporate Endpoints:** Monitor developer machines for rogue processes, unauthorized network sockets, and privilege escalation attacks in real-time.
 
 ---
 
-## 🌟 Deep Dive: The V2.0 Ten-Layer Defense Pipeline
+## 🏗️ Architecture
 
-AEGIS v2.0 introduces a massive, multi-staged security enrichment pipeline. When a raw OS telemetry event is intercepted by the kernel, it is piped through these 10 distinct micro-engines in real-time before being broadcasted to the Command Center:
+AEGIS converges four distinct, highly-complex computer science domains into a single, unbreakable platform:
 
-### 1. Threat Intel Feeds (O(1) Bloom Filters)
-Instead of executing slow database queries for every network event, AEGIS loads millions of known-bad IPs and Domains (from Abuse.ch Feodo Tracker, URLhaus, and SSLBL) into an in-memory **Bloom Filter**. This allows for `O(1)` constant-time lookups to instantly flag Command & Control (C2) server connections.
-
-### 2. MITRE ATT&CK Tagger
-AEGIS contains a localized heuristic engine that maps raw kernel events to specific **MITRE ATT&CK** tactics and techniques. For example, if a `bash` process spawns `nc` (netcat), the engine automatically tags the event with `T1059.004` (Unix Shell) and `T1095` (Non-Application Layer Protocol).
-
-### 3. Automated Playbooks & Action Ledger
-AEGIS doesn't just alert; it defends. If an event exceeds a critical threat threshold (e.g., Score > 90), the Playbook Engine executes automated response actions (like `isolate_host`, `kill_process`, or `block_ip`). Crucially, every action is recorded in a cryptographic **Action Ledger** with an "Undo Payload," allowing SOC analysts to mathematically reverse any false-positive defensive action with one click.
-
-### 4. Honeypot Deception Layer
-To eliminate false positives, AEGIS deploys "canary" files and decoy network ports across the host system. Legitimate software has no reason to interact with these decoys. If a process opens a honeypot file, the threat score instantly spikes to 100, bypassing the AI, as it guarantees unauthorized snooping or ransomware activity.
-
-### 5. Memory Forensics Scanner
-When high-severity processes are detected, AEGIS automatically dumps the active memory regions mapping (`/proc/PID/mem`). It then runs a high-speed string scanner against **YARA-style signatures** to search for in-memory footprints of known malware (e.g., Metasploit payloads, Cobalt Strike beacons) that avoid writing to the hard drive.
-
-### 6. LLM Alert Explainer (Ollama RAG)
-Instead of forcing analysts to decipher raw hex dumps and syscall IDs, AEGIS connects to a local, air-gapped Large Language Model (like **Qwen 2.5 Coder** via Ollama). The backend automatically feeds the event metadata and MITRE tags into a prompt, generating a plain-English, 3-sentence explanation of *what* the attacker did, and *what* to do next.
-
-### 7. UEBA (User & Entity Behavior Analytics)
-While the PyTorch LSTM models the entire system, the UEBA engine builds individual profiles for *every specific user* using **Isolation Forests**. It tracks login times, typical process trees, and resource consumption to identify insider threats (e.g., an accountant suddenly running `nmap` at 3:00 AM).
-
-### 8. GNN Lateral Movement Detection
-Standard AI only looks at one computer at a time. AEGIS uses **Graph Neural Networks (NetworkX & PyTorch Geometric)** to build a multi-hop graph of network connections. It analyzes the "edges" (connections) between "nodes" (hosts) to detect an attacker pivoting through the network (Host A -> Host B -> Host C) in an abnormally short time window.
-
-### 9. Privacy-Preserving Federated Learning
-In enterprise environments, sending sensitive behavioral data from employee laptops to a central cloud is a privacy risk. AEGIS utilizes **Federated Learning (FedAvg)**. The AI model is trained locally on the endpoint. Only the mathematical *weight updates* (with Laplace noise added for **Differential Privacy**, ε=0.1) are sent to the central server, merging into a global "Hive Mind" model without ever exposing user data.
-
-### 10. Post-Quantum Cryptography (NIST PQC)
-To future-proof the audit logs against quantum computers running Shor's algorithm, the AEGIS Zero-Knowledge authentication and Hash Chains are dual-signed. AEGIS implements the NIST-approved **Dilithium** algorithm for digital signatures and **Kyber** for key encapsulation, ensuring data captured today cannot be decrypted by quantum computers tomorrow.
+| Domain | Technology Stack | Purpose & Implementation |
+|:---|:---|:---|
+| 🔍 **OS Kernel Telemetry** | `eBPF` `BCC` `Python` | Operates strictly in kernel space. Intercepts file I/O, process execution (`execve`), and network connections completely invisibly to user-space malware. |
+| 🧠 **Artificial Intelligence** | `PyTorch` `LSTM` `GNN` | Behavioral anomaly detection (LSTM) and Lateral Movement detection (GNN). Designed to detect zero-days and multi-hop network traversals. |
+| 🔐 **Cryptography & ZK** | `circom` `snarkjs` `PQC` | Implements ZK-SNARKs for passwordless authentication, tamper-evident hash chaining, and Post-Quantum Cryptography (Dilithium/Kyber). |
+| ⚡ **Enrichment & Response** | `Python` `Memory Forensics` | 10-layer enrichment pipeline: Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, and LLM Explanations. |
+| 🌐 **Command Center** | `React 18` `FastAPI` `WS` | High-performance dashboard featuring Live Event Feeds, Threat Intel panels, Playbook Managers, and a unified status hub. |
 
 ---
 
-## 🔄 Comprehensive Data Flow & Sequence Diagram
+## 🌟 The Ten-Layer Defense Pipeline
 
-### 1. The 10-Layer Unified Threat Detection & Active Defense Pipeline
-This sequence details how a raw kernel event triggers the comprehensive multi-layered security pipeline, processes through all 10 intelligence modules, and is finally broadcasted to the command center.
+When a raw OS telemetry event is intercepted by the kernel, it doesn't just trigger an alert—it is piped through **10 distinct micro-engines** in real-time before being broadcasted to the Command Center:
+
+<details>
+<summary><b>1. Threat Intel Feeds (O(1) Bloom Filters)</b></summary>
+<br>
+Instead of executing slow database queries for every network event, AEGIS loads millions of known-bad IPs and Domains (from Abuse.ch, URLhaus, SSLBL) into an in-memory <b>Bloom Filter</b>. This allows for `O(1)` constant-time lookups to instantly flag Command & Control (C2) server connections.
+</details>
+
+<details>
+<summary><b>2. MITRE ATT&CK Tagger</b></summary>
+<br>
+AEGIS contains a localized heuristic engine that maps raw kernel events to specific <b>MITRE ATT&CK</b> tactics and techniques. (e.g., A `bash` process spawning `nc` automatically tags `T1059.004` and `T1095`).
+</details>
+
+<details>
+<summary><b>3. Automated Playbooks & Action Ledger</b></summary>
+<br>
+AEGIS doesn't just alert; it defends. If an event exceeds a critical threat threshold, the Playbook Engine executes automated response actions (e.g., `isolate_host`, `kill_process`). Every action is recorded in a cryptographic <b>Action Ledger</b> with an "Undo Payload," allowing SOC analysts to mathematically reverse actions with one click.
+</details>
+
+<details>
+<summary><b>4. Honeypot Deception Layer</b></summary>
+<br>
+AEGIS deploys "canary" files and decoy network ports across the host system. Legitimate software has no reason to interact with these decoys. Accessing a honeypot instantly spikes the threat score to 100, guaranteeing unauthorized activity.
+</details>
+
+<details>
+<summary><b>5. Memory Forensics Scanner</b></summary>
+<br>
+Upon detecting high-severity processes, AEGIS automatically dumps the active memory regions (`/proc/PID/mem`). It executes a high-speed string scanner against <b>YARA-style signatures</b> to search for in-memory footprints of fileless malware (e.g., Cobalt Strike beacons).
+</details>
+
+<details>
+<summary><b>6. LLM Alert Explainer (RAG Integration)</b></summary>
+<br>
+AEGIS connects to an air-gapped Large Language Model (e.g., <b>Qwen 2.5 Coder</b> via Ollama). It feeds event metadata and MITRE tags into a dynamic prompt, generating a plain-English, executive summary of the attack vector and recommended remediation steps.
+</details>
+
+<details>
+<summary><b>7. UEBA (User & Entity Behavior Analytics)</b></summary>
+<br>
+The UEBA engine builds individual profiles for <i>every specific user</i> using <b>Isolation Forests</b>, tracking login cadences, process trees, and resource consumption to identify insider threats and compromised accounts.
+</details>
+
+<details>
+<summary><b>8. GNN Lateral Movement Detection</b></summary>
+<br>
+AEGIS uses <b>Graph Neural Networks (NetworkX & PyTorch Geometric)</b> to build a multi-hop graph of network connections. It analyzes the "edges" between "nodes" to detect an attacker pivoting through the network (Host A -> Host B -> Host C).
+</details>
+
+<details>
+<summary><b>9. Privacy-Preserving Federated Learning</b></summary>
+<br>
+AEGIS utilizes <b>Federated Learning (FedAvg)</b> to maintain enterprise privacy. The AI model is trained locally on the endpoint. Only mathematical weight updates (with Laplace noise for <b>Differential Privacy</b>, ε=0.1) are sent to the central server, building a global "Hive Mind" model.
+</details>
+
+<details>
+<summary><b>10. Post-Quantum Cryptography (NIST PQC)</b></summary>
+<br>
+To future-proof the audit logs against quantum decryption (Shor's algorithm), AEGIS's Hash Chains are dual-signed using the NIST-approved <b>Dilithium</b> algorithm for digital signatures and <b>Kyber</b> for key encapsulation.
+</details>
+
+---
+
+## 🔄 Data Flow & Sequence Diagrams
+
+### 1. Unified Threat Detection Pipeline
+How a raw kernel event is processed through the intelligence modules and broadcasted to the command center.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Kernel as eBPF Kernel Hook
+    participant Kernel as eBPF Hook
     participant API as FastAPI Backend
-    participant Intel as Threat Intel (Bloom)
-    participant MITRE as MITRE Engine
-    participant AI_LSTM as Core AI (LSTM)
-    participant AI_UEBA as UEBA (Scikit)
-    participant AI_GNN as GNN Engine
-    participant Deception as Honeypot Layer
-    participant Action as Playbook Ledger
-    participant Forensics as Mem Forensics
-    participant Crypto as PQC & Hash Chain
-    participant Dash as React Dashboard
+    participant Pipeline as 10-Layer Engine
+    participant Crypto as PQC Ledger
+    participant Dash as React Command Center
 
-    %% Ingestion
-    Kernel->>API: Raw OS Event (Proc, Net, File)
+    Kernel->>API: Raw OS Event (Proc/Net/File)
     
-    %% Trivial O(1) Checks
-    API->>Intel: Check C2 Blacklists (O(1) Bloom)
-    Intel-->>API: Threat Intel Match?
-    
-    API->>MITRE: Heuristic Mapping
-    MITRE-->>API: MITRE TTPs (e.g., T1059)
-    
-    %% Multi-Model AI Ensembling
-    par AI Profiling Pipeline
-        API->>AI_LSTM: Autoencoder Reconstruction
-        AI_LSTM-->>API: Core Sequence Anomaly Score
-    and
-        API->>AI_UEBA: Isolation Forest User Profile
-        AI_UEBA-->>API: User Behavior Deviation
-    and
-        API->>AI_GNN: NetworkX Lateral Hop Analysis
-        AI_GNN-->>API: Network Topology Score
-    end
-    
-    %% Decoy Overrides
-    API->>Deception: Verify Target Assets
-    opt Touches Canary/Honeypot?
-        Deception-->>API: Overwrite Score = 100 (Critical)
-    end
-    
-    %% Active Defense Response
-    opt If Final Score > Threshold
-        API->>Action: Trigger Automated Playbook
-        Action->>Kernel: Execute (e.g., Terminate Process)
-        Action->>Crypto: Log Reversible Action in Ledger
+    rect rgb(30, 30, 40)
+        note right of API: Execution of the 10-Layer Pipeline
+        API->>Pipeline: Check C2 Blacklists (Bloom)
+        Pipeline-->>API: Threat Intel Match?
+        API->>Pipeline: MITRE Heuristic Mapping
         
-        API->>Forensics: Dump /proc/PID/mem
-        Forensics-->>API: YARA String Matches
+        par AI Profiling Pipeline
+            API->>Pipeline: LSTM Autoencoder (System)
+        and
+            API->>Pipeline: UEBA Isolation Forest (User)
+        and
+            API->>Pipeline: GNN (Lateral Movement)
+        end
+        
+        API->>Pipeline: Verify Target against Honeypots
+        
+        opt If Final Score > Critical Threshold
+            API->>Pipeline: Trigger Playbook (Kill/Isolate)
+            API->>Pipeline: YARA Memory Forensics Dump
+        end
     end
     
-    %% Immutable Logging & PQC
-    API->>Crypto: Sign data with Post-Quantum (Dilithium)
-    Crypto->>Crypto: Chained SHA-256 (Hash_N = hash(N-1 + Event))
-    Crypto-->>API: Cryptographic Seal
+    API->>Crypto: Sign data with Dilithium (PQC)
+    Crypto->>Crypto: Chained SHA-256 (Hash_N)
+    Crypto-->>API: Cryptographic Seal Applied
     
-    %% UI Broadcast
     API->>Dash: Broadcast Event via WebSocket
-    Dash->>API: Request Plain-Text Explanation
-    API->>Dash: LLM (Ollama) Explainer Stream
+    Dash->>API: Request LLM Explanation (Ollama)
+    API->>Dash: Plain-Text Insight Stream
 ```
 
-### 2. Zero-Knowledge Passwordless Auth Flow
+### 2. Zero-Knowledge Passwordless Authentication
 ```mermaid
 sequenceDiagram
     participant User as End User
@@ -193,14 +198,14 @@ sequenceDiagram
 
 ## 💻 Installation & Deployment
 
-Deploying AEGIS locally is streamlined for testing, development, and research.
+Deploying AEGIS locally is streamlined for testing, development, and research environments.
 
 ### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- A [Supabase](https://supabase.com/) project (Free tier works perfectly).
+*   **Python 3.10+**
+*   **Node.js 18+**
+*   A **[Supabase](https://supabase.com/)** project (Free tier is sufficient).
 
-### Step 1: Clone & Prepare Environments
+### 1. Clone & Prepare
 ```bash
 git clone https://github.com/yourusername/aegis.git
 cd aegis
@@ -214,7 +219,7 @@ AUDIT_ENCRYPTION_KEY=generate_this_via_python_script
 JWT_SECRET=a_very_long_secure_random_string
 FRONTEND_URL=http://localhost:5173
 ```
-*(Generate `AUDIT_ENCRYPTION_KEY` using: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`)*
+> **Tip:** Generate `AUDIT_ENCRYPTION_KEY` using: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`
 
 Create a `.env` file in the **`frontend/`** directory:
 ```env
@@ -224,23 +229,23 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-### Step 2: Boot up the Backend (FastAPI + AI Engine)
+### 2. Boot the Backend (FastAPI + AI Engine)
 ```bash
 cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 ```
 
-### Step 3: Boot up the Frontend (React Dashboard)
+### 3. Boot the Frontend (Command Center)
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Navigate to `http://localhost:5173` to access the Command Center.
+Navigate to `http://localhost:5173` to access the AEGIS platform.
 
-### Step 4: Run the Telemetry Agent
-To generate realistic OS data and simulate attacks on your dashboard, use the included Python simulator (perfect for Windows/Mac users without eBPF capabilities):
+### 4. Run the Telemetry Agent
+To generate realistic OS data and simulate attacks on your dashboard, use the included cross-platform Python simulator:
 ```bash
 cd agent
 python agent_sim.py --attack
@@ -250,11 +255,11 @@ python agent_sim.py --attack
 
 ## 🧠 AI Training Pipeline
 
-By default, the backend falls back to rule-based threat scoring if an AI model isn't present. To unleash the full power of AEGIS, you must train the LSTM Neural Network on your machine's baseline telemetry.
+By default, the backend utilizes rule-based threat scoring if an AI model isn't trained. To unleash the full predictive power of AEGIS, train the LSTM Neural Network on your machine's baseline telemetry.
 
-1. Ensure your `agent_sim.py` and `backend` are both running so data is being collected.
+1. Ensure your `agent_sim.py` and `backend` are actively running to collect data.
 2. Open a **new terminal** in the `backend/` directory.
-3. **Download your collected telemetry** to use as baseline training data:
+3. **Download baseline telemetry:**
    ```bash
    python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent?limit=1000', '../baseline_events.json')"
    ```
@@ -262,24 +267,24 @@ By default, the backend falls back to rule-based threat scoring if an AI model i
    ```bash
    python ai/trainer.py ../baseline_events.json
    ```
-   *The system will process the sequences, train the PyTorch model for 100 epochs, and automatically save the `.pt` binary. The backend will instantly switch from rule-based scoring to AI predictions without requiring a restart!*
+   *The system processes the sequences, trains the PyTorch model for 100 epochs, and automatically saves the `.pt` binary. The backend seamlessly hot-swaps to AI predictions without requiring a restart.*
 
 ---
 
 ## 📡 API Reference
 
-AEGIS exposes a clean REST API and a robust WebSocket interface.
+AEGIS exposes a clean REST API and a highly-performant WebSocket interface for real-time telemetry.
 
-| Category | Method | Endpoint | Description |
-|----------|--------|----------|-------------|
-| **Auth** | `POST` | `/api/auth/register` | Register identity using ZK public hash |
-| **Auth** | `POST` | `/api/auth/login` | Authenticate using ZK-SNARK zero-knowledge proof |
-| **Events** | `POST` | `/api/events` | Ingest bulk telemetry from eBPF agent |
-| **Events** | `GET` | `/api/events/recent` | Retrieve latest cached system events (JSON array) |
-| **Events** | `GET` | `/api/events/stats` | Aggregate dashboard statistics and threat ratios |
-| **Audit** | `GET` | `/api/audit` | Fetch encrypted cryptographic audit logs |
-| **Audit** | `GET` | `/api/audit/verify/chain` | Trigger a full mathematical validation on the SHA-256 chain |
-| **Stream** | `WS` | `/ws/events` | Real-time bidirectional WebSocket event streaming |
+| Endpoint | Method | Description |
+|:---|:---:|:---|
+| `/api/auth/register` | `POST` | Register identity using ZK public hash |
+| `/api/auth/login` | `POST` | Authenticate using ZK-SNARK zero-knowledge proof |
+| `/api/events` | `POST` | Ingest bulk telemetry from eBPF agent |
+| `/api/events/recent` | `GET` | Retrieve latest cached system events |
+| `/api/events/stats` | `GET` | Aggregate dashboard statistics and threat ratios |
+| `/api/audit` | `GET` | Fetch encrypted cryptographic audit logs |
+| `/api/audit/verify/chain` | `GET` | Trigger full mathematical validation on the SHA-256 chain |
+| `/ws/events` | `WS` | Real-time bidirectional WebSocket event streaming |
 
 ---
 
@@ -288,41 +293,32 @@ AEGIS exposes a clean REST API and a robust WebSocket interface.
 ```text
 AEGIS/
 ├── agent/                    # Telemetry Collection Layer
-│   ├── agent.py              # True eBPF BCC kernel hook script (Linux)
-│   ├── agent_sim.py          # Cross-platform data & attack simulator
-│   └── collector.py          # Ring-buffer telemetry aggregation
+│   ├── agent.py              # eBPF BCC kernel hook script
+│   └── agent_sim.py          # Cross-platform data & attack simulator
 ├── backend/                  # Application Logic Layer (The Brain)
-│   ├── ai/                   # PyTorch LSTM Autoencoder (Baseline Anomaly Detection)
-│   ├── api/                  # FastAPI REST & WebSocket controllers (10-layer middleware)
-│   ├── core/                 # Configuration and environment settings
-│   ├── crypto/               # ZK-proof verification, SHA-256 chaining & Post-Quantum Cryptography
-│   ├── db/                   # Supabase PostgreSQL ORM & in-memory fallback
-│   ├── federated/            # Federated Learning Server (Differential Privacy aggregation)
-│   ├── forensics/            # Automated memory dumping (`/proc/PID/mem`) & YARA signature scanning
-│   ├── gnn/                  # Graph Neural Network builder for Lateral Movement detection
-│   ├── honeypot/             # Deception infrastructure manager (Decoy files, canary ports)
-│   ├── intel/                # O(1) Bloom Filter Threat Feeds & MITRE ATT&CK Tagger
-│   ├── llm/                  # RAG-based Alert Explainer connecting to local Ollama (Qwen)
-│   ├── playbooks/            # Automated Response Engine & reversible Action Ledger
-│   ├── ueba/                 # User & Entity Behavior Analytics (Isolation Forest profiling)
-│   └── main.py               # Uvicorn entry point orchestrating all 10 modules
+│   ├── ai/                   # PyTorch LSTM Autoencoder
+│   ├── api/                  # FastAPI REST & WebSocket controllers
+│   ├── crypto/               # ZK-proofs, Hash Chaining & Post-Quantum Cryptography
+│   ├── federated/            # Federated Learning Server (Differential Privacy)
+│   ├── forensics/            # Automated memory dumping & YARA scanning
+│   ├── gnn/                  # Graph Neural Network lateral movement builder
+│   ├── honeypot/             # Deception infrastructure manager
+│   ├── intel/                # O(1) Bloom Filter Threat Feeds
+│   ├── llm/                  # RAG-based Alert Explainer
+│   ├── playbooks/            # Automated Response Engine
+│   └── ueba/                 # User & Entity Behavior Analytics
 ├── frontend/                 # Presentation Layer
-│   ├── src/components/       # Real-time Threat Gauges, Recharts, Event Feeds
-│   ├── src/hooks/            # useWebSocket & useZKAuth custom hooks
-│   └── src/pages/            # Dashboard, Threat Intel, Playbooks, Features, and Auth interfaces
+│   ├── src/components/       # Threat Gauges, Event Feeds, Data Visualizations
+│   └── src/pages/            # Dashboard, Threat Intel, Playbooks, Auth Flow
 └── zk/                       # Zero-Knowledge Circuit Definitions
-    └── circuit.circom        # Poseidon hash proving circuits (circom)
+    └── circuit.circom        # Poseidon hash proving circuits
 ```
 
 ---
 
-## 📜 License & Acknowledgements
-
-This project is licensed under the **MIT License**.
-
-Designed and engineered as an advanced cybersecurity platform showcasing the integration of deep learning, low-level kernel tracing, and applied cryptography. 
-
 <div align="center">
   <br>
   <b>Built for a Zero-Trust World.</b>
+  <br><br>
+  <i>Licensed under the MIT License</i>
 </div>

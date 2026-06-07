@@ -73,13 +73,14 @@ export default function Features() {
         </div>
         <div style={{
           padding: '8px 18px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 800,
-          background: 'linear-gradient(135deg, rgba(6,214,160,0.1), rgba(129,140,248,0.1))',
-          border: '1px solid rgba(6,214,160,0.2)', color: 'var(--safe)',
+          background: status ? 'linear-gradient(135deg, rgba(6,214,160,0.1), rgba(129,140,248,0.1))' : 'rgba(248, 113, 113, 0.1)',
+          border: status ? '1px solid rgba(6,214,160,0.2)' : '1px solid rgba(248, 113, 113, 0.2)', 
+          color: status ? 'var(--safe)' : 'var(--danger)',
           display: 'flex', alignItems: 'center', gap: '6px',
           backdropFilter: 'blur(8px)',
         }}>
-          <CheckCircle size={14} />
-          {loading ? '...' : '10/10 Features Active'}
+          {status ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {loading ? '...' : (status ? '10/10 Features Active' : 'Offline - Backend Unreachable')}
         </div>
       </div>
 
@@ -118,15 +119,15 @@ export default function Features() {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{f.name}</div>
                   <div style={{
-                    fontSize: '0.62rem', fontWeight: 700, color: 'var(--safe)',
+                    fontSize: '0.62rem', fontWeight: 700, color: status ? 'var(--safe)' : 'var(--danger)',
                     display: 'flex', alignItems: 'center', gap: '4px',
                     textTransform: 'uppercase', letterSpacing: '0.08em',
                   }}>
                     <div style={{
-                      width: 6, height: 6, borderRadius: '50%', background: 'var(--safe)',
-                      boxShadow: '0 0 6px rgba(6,214,160,0.4)',
+                      width: 6, height: 6, borderRadius: '50%', background: status ? 'var(--safe)' : 'var(--danger)',
+                      boxShadow: status ? '0 0 6px rgba(6,214,160,0.4)' : '0 0 6px rgba(248,113,113,0.4)',
                     }} />
-                    Active
+                    {status ? 'Active' : 'Offline'}
                   </div>
                 </div>
               </div>
@@ -140,12 +141,12 @@ export default function Features() {
 
               <div style={{
                 fontSize: '0.7rem', fontFamily: 'var(--font-mono)', fontWeight: 600,
-                color: 'var(--accent)',
+                color: status ? 'var(--accent)' : 'var(--text-muted)',
                 padding: '8px 12px', borderRadius: 'var(--radius-sm)',
-                background: 'rgba(6,214,160,0.04)',
-                border: '1px solid rgba(6,214,160,0.08)',
+                background: status ? 'rgba(6,214,160,0.04)' : 'rgba(255,255,255,0.03)',
+                border: status ? '1px solid rgba(6,214,160,0.08)' : '1px solid rgba(255,255,255,0.05)',
               }}>
-                {f.stat(featureStatus)}
+                {status ? f.stat(featureStatus) : 'Service Unavailable'}
               </div>
             </div>
           )
