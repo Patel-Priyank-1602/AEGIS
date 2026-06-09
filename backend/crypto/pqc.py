@@ -21,10 +21,13 @@ from typing import Optional, Dict, Tuple
 _pqc_available = False
 try:
     import oqs
-    _pqc_available = True
-    print("[PQC] liboqs available — post-quantum cryptography enabled")
+    if hasattr(oqs, 'Signature'):
+        _pqc_available = True
+        print("[PQC] liboqs available — post-quantum cryptography enabled")
+    else:
+        print("[PQC] Using simulated PQC signatures (native liboqs not detected)")
 except ImportError:
-    print("[PQC] liboqs not installed. Using simulated PQC signatures.")
+    print("[PQC] Using simulated PQC signatures (native liboqs not detected)")
 
 
 class PQCManager:

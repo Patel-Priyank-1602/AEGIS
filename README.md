@@ -59,7 +59,7 @@ AEGIS converges four distinct, highly-complex computer science domains into a si
 
 | Domain | Technology Stack | Purpose & Implementation |
 |:---|:---|:---|
-| 🔍 **OS Kernel Telemetry** | `eBPF` `BCC` `Python` | Operates strictly in kernel space. Intercepts file I/O, process execution (`execve`), and network connections completely invisibly to user-space malware. |
+| 🔍 **OS Kernel Telemetry** | `Python` `psutil` `WinAPI` | Cross-platform agent collecting state directly from OS-level structures (Processes, Network Sockets, Health) with zero-forgery guarantees. |
 | 🧠 **Artificial Intelligence** | `PyTorch` `LSTM` `GNN` | Behavioral anomaly detection (LSTM) and Lateral Movement detection (GNN). Designed to detect zero-days and multi-hop network traversals. |
 | 🔐 **Cryptography & ZK** | `circom` `snarkjs` `PQC` | Implements ZK-SNARKs for passwordless authentication, tamper-evident hash chaining, and Post-Quantum Cryptography (Dilithium/Kyber). |
 | ⚡ **Enrichment & Response** | `Python` `Memory Forensics` | 10-layer enrichment pipeline: Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, and LLM Explanations. |
@@ -141,13 +141,15 @@ How a raw kernel event is processed through the intelligence modules and broadca
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Kernel as eBPF Hook
+    participant Agent as Agent (real_agent.py)
     participant API as FastAPI Backend
     participant Pipeline as 10-Layer Engine
     participant Crypto as PQC Ledger
     participant Dash as React Command Center
 
-    Kernel->>API: Raw OS Event (Proc/Net/File)
+    Agent->>Agent: Collect OS State (psutil)
+    Agent->>Agent: Sign Batch (HMAC-SHA256 + Nonce + Machine ID)
+    Agent->>API: HTTP POST /api/events (Signed Headers)
     
     rect rgb(30, 30, 40)
         note right of API: Execution of the 10-Layer Pipeline
@@ -248,8 +250,18 @@ npm run dev
 ```
 Navigate to `http://localhost:5173` to access the AEGIS platform.
 
-### 4. Run the Telemetry Agent
-To generate realistic OS data and simulate attacks on your dashboard, use the included cross-platform Python simulator:
+### 4. Choose Your Telemetry Agent
+AEGIS provides two different agents depending on your use case:
+
+**Option A: The Genuine Agent (For Production/Real Use)**
+Run this to collect real, cryptographically signed telemetry from your actual machine:
+```bash
+cd agent
+python real_agent.py --verbose
+```
+
+**Option B: The Simulator (For Demos & Testing)**
+Run this if you want to generate fake, randomized attack data to test the dashboard and AI:
 ```bash
 cd agent
 python agent_sim.py --attack
@@ -259,19 +271,20 @@ python agent_sim.py --attack
 
 ## 🧠 AI Training Pipeline
 
-By default, the backend utilizes rule-based threat scoring if an AI model isn't trained. To unleash the full predictive power of AEGIS, train the LSTM Neural Network on your machine's baseline telemetry.
+AEGIS comes with a pre-trained `lstm_model.pt` available in the repository. **However, this baseline model is trained on the developer's machine data.** Because AEGIS relies on learning the unique "normal" behavior of *your* specific operating system and network habits, **you must retrain the model on your own genuine data for high-fidelity anomaly detection.**
 
-1. Ensure your `agent_sim.py` and `backend` are actively running to collect data.
-2. Open a **new terminal** in the `backend/` directory.
-3. **Download baseline telemetry:**
+1. Ensure your `real_agent.py` and `backend` are actively running to collect data.
+2. Let the agent run for a few hours to gather a solid baseline of your normal daily activity.
+3. Open a **new terminal** in the `backend/` directory.
+4. **Download your baseline telemetry:**
    ```bash
    python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent?limit=1000', '../baseline_events.json')"
    ```
-4. **Train the LSTM Autoencoder:**
+5. **Train the LSTM Autoencoder on your data:**
    ```bash
    python ai/trainer.py ../baseline_events.json
    ```
-   *The system processes the sequences, trains the PyTorch model for 100 epochs, and automatically saves the `.pt` binary. The backend seamlessly hot-swaps to AI predictions without requiring a restart.*
+   *The system will process the sequences and train the PyTorch model for 1000 epochs, overwriting the default `.pt` binary with a custom AI tailored specifically to your machine. The backend seamlessly hot-swaps to the new model instantly.*
 
 ---
 
@@ -297,7 +310,8 @@ AEGIS exposes a clean REST API and a highly-performant WebSocket interface for r
 ```text
 AEGIS/
 ├── agent/                    # Telemetry Collection Layer
-│   ├── agent.py              # eBPF BCC kernel hook script
+│   ├── real_agent.py         # Genuine cross-platform agent (psutil, HMAC signing)
+│   ├── agent.py              # Legacy/eBPF agent hook
 │   └── agent_sim.py          # Cross-platform data & attack simulator
 ├── backend/                  # Application Logic Layer (The Brain)
 │   ├── ai/                   # PyTorch LSTM Autoencoder

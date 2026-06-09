@@ -107,7 +107,7 @@ def main():
     interval = 0.3 if fast_mode else 1.0
 
     print("╔══════════════════════════════════════════════╗")
-    print("║        AEGIS Simulated Agent v1.0            ║")
+    print("║            AEGIS Simulated Agent             ║")
     print("║   Generates realistic OS events for demo     ║")
     print("╚══════════════════════════════════════════════╝")
     print()
