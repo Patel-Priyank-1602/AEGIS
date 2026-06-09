@@ -59,10 +59,10 @@ AEGIS converges four distinct, highly-complex computer science domains into a si
 
 | Domain | Technology Stack | Purpose & Implementation |
 |:---|:---|:---|
-| 🔍 **OS Kernel Telemetry** | `Python` `psutil` `WinAPI` | Cross-platform agent collecting state directly from OS-level structures (Processes, Network Sockets, Health) with zero-forgery guarantees. |
+| 🔍 **OS Kernel Telemetry** | `Python` `eBPF` `psutil` | Cross-platform and Linux Kernel agents collecting state directly from OS-level structures (Processes, Network Sockets, Health) with zero-forgery guarantees. |
 | 🧠 **Artificial Intelligence** | `PyTorch` `LSTM` `GNN` | Behavioral anomaly detection (LSTM) and Lateral Movement detection (GNN). Designed to detect zero-days and multi-hop network traversals. |
 | 🔐 **Cryptography & ZK** | `circom` `snarkjs` `PQC` | Implements ZK-SNARKs for passwordless authentication, tamper-evident hash chaining, and Post-Quantum Cryptography (Dilithium/Kyber). |
-| ⚡ **Enrichment & Response** | `Python` `Memory Forensics` | 10-layer enrichment pipeline: Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, and LLM Explanations. |
+| ⚡ **Enrichment & Response** | `Python` `YARA` `Ollama` | 10-layer enrichment pipeline including Threat Intel, MITRE ATT&CK, Playbooks, Honeypots, Memory Forensics, UEBA, and LLM Explanations. |
 | 🌐 **Command Center** | `React 18` `FastAPI` `WS` | High-performance dashboard featuring Live Event Feeds, Threat Intel panels, Playbook Managers, and a unified status hub. |
 
 ---
@@ -275,14 +275,14 @@ AEGIS comes with a pre-trained `lstm_model.pt` available in the repository. **Ho
 
 1. Ensure your `real_agent.py` and `backend` are actively running to collect data.
 2. Let the agent run for a few hours to gather a solid baseline of your normal daily activity.
-3. Open a **new terminal** in the `backend/` directory.
+3. Open a **new terminal** in the project root directory (`AEGIS/`).
 4. **Download your baseline telemetry:**
    ```bash
-   python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent?limit=1000', '../baseline_events.json')"
+   python -c "import urllib.request; urllib.request.urlretrieve('http://localhost:8000/api/events/recent?limit=1000', 'baseline_events.json')"
    ```
 5. **Train the LSTM Autoencoder on your data:**
    ```bash
-   python ai/trainer.py ../baseline_events.json
+   python scripts/train_model.py baseline_events.json
    ```
    *The system will process the sequences and train the PyTorch model for 1000 epochs, overwriting the default `.pt` binary with a custom AI tailored specifically to your machine. The backend seamlessly hot-swaps to the new model instantly.*
 
@@ -296,11 +296,21 @@ AEGIS exposes a clean REST API and a highly-performant WebSocket interface for r
 |:---|:---:|:---|
 | `/api/auth/register` | `POST` | Register identity using ZK public hash |
 | `/api/auth/login` | `POST` | Authenticate using ZK-SNARK zero-knowledge proof |
-| `/api/events` | `POST` | Ingest bulk telemetry from eBPF agent |
+| `/api/events` | `POST` | Ingest bulk telemetry from eBPF/psutil agent |
 | `/api/events/recent` | `GET` | Retrieve latest cached system events |
 | `/api/events/stats` | `GET` | Aggregate dashboard statistics and threat ratios |
 | `/api/audit` | `GET` | Fetch encrypted cryptographic audit logs |
 | `/api/audit/verify/chain` | `GET` | Trigger full mathematical validation on the SHA-256 chain |
+| `/api/threat-intel/stats` | `GET` | Get threat intelligence feed statistics |
+| `/api/playbooks` | `GET` | List all available playbooks and their configurations |
+| `/api/honeypot/alerts` | `GET` | Get recent honeypot intrusion alerts |
+| `/api/forensics/captures` | `GET` | Get recent memory forensics captures |
+| `/api/explain` | `POST` | Generate an LLM explanation for a security alert |
+| `/api/ueba/profiles` | `GET` | Get all user behavioral profiles sorted by risk |
+| `/api/graph/alerts` | `GET` | Get lateral movement (GNN) detection alerts |
+| `/api/federated/stats` | `GET` | Get federated learning server statistics |
+| `/api/pqc/stats` | `GET` | Get post-quantum cryptography statistics |
+| `/api/features/status` | `GET` | Get unified status of all 10 advanced features |
 | `/ws/events` | `WS` | Real-time bidirectional WebSocket event streaming |
 
 ---
@@ -312,11 +322,16 @@ AEGIS/
 ├── agent/                    # Telemetry Collection Layer
 │   ├── real_agent.py         # Genuine cross-platform agent (psutil, HMAC signing)
 │   ├── agent.py              # Legacy/eBPF agent hook
-│   └── agent_sim.py          # Cross-platform data & attack simulator
+│   ├── agent_sim.py          # Cross-platform data & attack simulator
+│   ├── collector.py          # System telemetry collection module
+│   └── sender.py             # Secure payload transmission
 ├── backend/                  # Application Logic Layer (The Brain)
+│   ├── main.py               # FastAPI application entry point
 │   ├── ai/                   # PyTorch LSTM Autoencoder
 │   ├── api/                  # FastAPI REST & WebSocket controllers
+│   ├── core/                 # Core configuration and security
 │   ├── crypto/               # ZK-proofs, Hash Chaining & Post-Quantum Cryptography
+│   ├── db/                   # Database models and connections
 │   ├── federated/            # Federated Learning Server (Differential Privacy)
 │   ├── forensics/            # Automated memory dumping & YARA scanning
 │   ├── gnn/                  # Graph Neural Network lateral movement builder
@@ -325,11 +340,22 @@ AEGIS/
 │   ├── llm/                  # RAG-based Alert Explainer
 │   ├── playbooks/            # Automated Response Engine
 │   └── ueba/                 # User & Entity Behavior Analytics
-├── frontend/                 # Presentation Layer
-│   ├── src/components/       # Threat Gauges, Event Feeds, Data Visualizations
-│   └── src/pages/            # Dashboard, Threat Intel, Playbooks, Auth Flow
-└── zk/                       # Zero-Knowledge Circuit Definitions
-    └── circuit.circom        # Poseidon hash proving circuits
+├── frontend/                 # Presentation Layer (React + Vite)
+│   ├── public/               # Static assets
+│   └── src/
+│       ├── components/       # Threat Gauges, Event Feeds, Data Visualizations
+│       ├── hooks/            # Custom React hooks
+│       ├── pages/            # Dashboard, Threat Intel, Playbooks, Auth Flow
+│       └── services/         # API and WebSocket client services
+├── scripts/                  # Utility and setup scripts
+│   ├── generate_zk.sh        # ZK-SNARKs circuit generation
+│   ├── setup_wsl.sh          # eBPF/WSL setup instructions
+│   └── train_model.py        # Baseline AI training script
+├── zk/                       # Zero-Knowledge Circuit Definitions
+│   └── circuit.circom        # Poseidon hash proving circuits
+├── baseline_events.json      # Baseline telemetry data for AI training
+├── docker-compose.yml        # Container orchestration
+└── guide.md                  # Detailed platform documentation
 ```
 
 ---
