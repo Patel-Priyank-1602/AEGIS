@@ -28,9 +28,10 @@ class BloomFilter:
         return [(h1 + i * h2) % self.size for i in range(self.hash_count)]
 
     def add(self, item: str):
-        for pos in self._hashes(item.lower().strip()):
-            self.bit_array[pos // 8] |= (1 << (pos % 8))
-        self.count += 1
+        if item not in self:
+            for pos in self._hashes(item.lower().strip()):
+                self.bit_array[pos // 8] |= (1 << (pos % 8))
+            self.count += 1
 
     def __contains__(self, item: str) -> bool:
         return all(
